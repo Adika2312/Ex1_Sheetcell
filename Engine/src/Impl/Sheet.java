@@ -8,9 +8,9 @@ public class Sheet {
     private int version=1;
     private List<List<Cell>> cells = new ArrayList<>();
     private int numOfRows=7;
-    private int numOfCols=12;
-    private float rowWidth=2;
-    private float colWidth=5;
+    private int numOfCols=10;
+    private float rowWidth=1;
+    private float colWidth=1;
 
     public Sheet(){
         for(int i=0;i<numOfRows;i++){
@@ -30,7 +30,7 @@ public class Sheet {
 
         sb.append("Name: " + name + "\n");
         sb.append("Version: " + version + "\n");
-        sb.append(String.format("%" + widthOfFirstCol + "s", "") + String.format("%-" + (int) (colWidth-1) + "s", ""));
+        sb.append(String.format("%" + widthOfFirstCol + "s", "") + String.format("%-" + (int) (colWidth) + "s", ""));
 
         for(int i=0;i<numOfCols;i++){
             sb.append(String.format("%-" + (int) (colWidth+1) + "s", colCounter++));
