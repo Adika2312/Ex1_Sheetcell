@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/Ex1_Sheetcell.iml" filepath="$PROJECT_DIR$/Ex1_Sheetcell.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Sheetcell.iml" filepath="$PROJECT_DIR$/Sheetcell.iml" />
     </modules>
   </component>
 </project>
