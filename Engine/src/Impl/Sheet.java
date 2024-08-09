@@ -7,10 +7,10 @@ public class Sheet {
     private String name="Baby";
     private int version=1;
     private List<List<Cell>> cells = new ArrayList<>();
-    private int numOfRows=7;
+    private int numOfRows=12;
     private int numOfCols=10;
-    private float rowWidth=1;
-    private float colWidth=1;
+    private float rowHeight=2;
+    private float colWidth=4;
 
     public Sheet(){
         for(int i=0;i<numOfRows;i++){
@@ -30,7 +30,7 @@ public class Sheet {
 
         sb.append("Name: " + name + "\n");
         sb.append("Version: " + version + "\n");
-        sb.append(String.format("%" + widthOfFirstCol + "s", "") + String.format("%-" + (int) (colWidth) + "s", ""));
+        sb.append(String.format("%" + (widthOfFirstCol+2) + "s", ""));
 
         for(int i=0;i<numOfCols;i++){
             sb.append(String.format("%-" + (int) (colWidth+1) + "s", colCounter++));
@@ -38,8 +38,7 @@ public class Sheet {
         sb.append("\n");
 
         for (List<Cell> row : cells) {
-            sb.append(String.format("%" + widthOfFirstCol + "d", rowsCounter++));
-            sb.append(" ");
+            sb.append(String.format("%" + widthOfFirstCol + "d", rowsCounter++)).append(" ");
             for (Cell cell : row) {
                 String cellValue = cell.toString();
                 // Adjust cell value to fit within the column width TODO
@@ -49,6 +48,9 @@ public class Sheet {
                 sb.append(String.format("|" + "%-" + (int) colWidth + "s", cellValue));
             }
             sb.append("|\n");
+            for(int j=0;j<rowHeight-1;j++){
+                sb.append("\n");
+            }
         }
 
         return sb.toString();
