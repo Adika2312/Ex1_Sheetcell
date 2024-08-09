@@ -38,7 +38,7 @@ public class Sheet {
         sb.append("\n");
 
         for (List<Cell> row : cells) {
-            sb.append(String.format("%" + widthOfFirstCol + "d", rowsCounter++)).append(" ");
+            sb.append(String.format("%0" + widthOfFirstCol + "d", rowsCounter++)).append(" ");
             for (Cell cell : row) {
                 String cellValue = cell.toString();
                 // Adjust cell value to fit within the column width TODO
