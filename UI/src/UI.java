@@ -3,6 +3,7 @@ import Impl.EngineImpl;
 
 import java.util.InputMismatchException;
 import java.util.Scanner;
+import java.util.regex.Pattern;
 
 public class UI {
     Engine engine = new EngineImpl();
@@ -52,7 +53,7 @@ Welcome to the Sheetcell!
                         PrintSheet();
                         break;
                     case DISPLAY_CELL:
-                        System.out.println("Displaying cell...");
+                        PrintCell();
                         break;
                     case UPDATE_CELL:
                         System.out.println("Updating cell...");
@@ -73,12 +74,65 @@ Welcome to the Sheetcell!
             }
         }
         catch (InputMismatchException e){
-            System.out.println("Invalid input, please enter a whole number.");
+            System.out.println("Invalid choice, please enter a whole number.");
+            scanner.nextLine();
         }
         catch(Exception e) {
             System.out.println(e.getMessage());
+            scanner.nextLine();
         }
     }
+
+    private void PrintCell() {
+
+        Scanner scanner = new Scanner(System.in);
+        String cellIdentity;
+        Pattern cellPattern = Pattern.compile("^[A-Z]+[1-9][0-9]*$");
+        int col;
+        int row;
+
+        while(true){
+            System.out.println("Please enter the cell identity (e.g., A4) to view its value and status:");
+            cellIdentity = scanner.nextLine().trim();
+
+            if (cellPattern.matcher(cellIdentity).matches()) {
+                String columnString = cellIdentity.replaceAll("[0-9]", "");
+                String rowString = cellIdentity.replaceAll("[A-Z]", "");
+                col = extractColumn(columnString);
+                row = extractRow(rowString);
+
+                if(engine.IsCellInBounds(row, col)){
+                    break;
+                }
+                else{
+                    System.out.println("Invalid cell identity, Please enter a cell within the sheet boundaries");
+                }
+            }
+            else {
+                System.out.println("Invalid cell identity. Please enter a cell in the right format (e.g., A4).");
+            }
+        }
+
+        System.out.println("Cell Identity: " + cellIdentity);
+        System.out.println(engine.getCellValue(row, col));
+    }
+
+    private static int extractRow(String cellName) {
+        String rowPart = cellName.replaceAll("[A-Z]+", "");
+        return Integer.parseInt(rowPart) - 1;
+    }
+
+    private static int extractColumn(String cellName) {
+        String columnPart = cellName.replaceAll("[0-9]+", "");
+        int column = 0;
+
+        for (int i = 0; i < columnPart.length(); i++) {
+            column = column * 26 + (columnPart.charAt(i) - 'A' + 1);
+        }
+
+        return column - 1;
+    }
+
 
     private void PrintMenu() {
         System.out.println("""

@@ -6,7 +6,7 @@ import java.util.List;
 public class Sheet {
     private String name="Baby";
     private int version=1;
-    private List<List<Cell>> cells = new ArrayList<>();
+    private final List<List<Cell>> cells = new ArrayList<>();
     private int numOfRows=12;
     private int numOfCols=10;
     private float rowHeight=2;
@@ -28,8 +28,8 @@ public class Sheet {
         char colCounter = 'A';
         int widthOfFirstCol = countDigits(numOfRows);
 
-        sb.append("Name: " + name + "\n");
-        sb.append("Version: " + version + "\n");
+        sb.append("Name: ").append(name).append("\n");
+        sb.append("Version: ").append(version).append("\n");
         sb.append(String.format("%" + (widthOfFirstCol+2) + "s", ""));
 
         for(int i=0;i<numOfCols;i++){
@@ -40,7 +40,7 @@ public class Sheet {
         for (List<Cell> row : cells) {
             sb.append(String.format("%0" + widthOfFirstCol + "d", rowsCounter++)).append(" ");
             for (Cell cell : row) {
-                String cellValue = cell.toString();
+                String cellValue = cell.getCellEffectiveValue();
                 // Adjust cell value to fit within the column width TODO
                 if (cellValue.length() > colWidth) {
                     cellValue = cellValue.substring(0, (int) colWidth);
@@ -67,5 +67,17 @@ public class Sheet {
             count++;
         }
         return count;
+    }
+
+    public String getCellData(int row, int col) {
+        return cells.get(row).get(col).toString();
+    }
+
+    public int getNumOfRows() {
+        return numOfRows;
+    }
+
+    public int getNumOfCols() {
+        return numOfCols;
     }
 }

@@ -3,7 +3,7 @@ package Impl;
 import API.Engine;
 
 public class EngineImpl implements Engine {
-    private Sheet currentSheet;
+    private Sheet currentSheet = new Sheet();
 
     @Override
     public Sheet GetSheet() {
@@ -13,6 +13,12 @@ public class EngineImpl implements Engine {
     }
 
     @Override
-    public void Exit() {
+    public String getCellValue(int row, int col) {
+        return currentSheet.getCellData(row, col);
+    }
+
+    @Override
+    public boolean IsCellInBounds(int row, int col) {
+        return(row >= 0 && row < currentSheet.getNumOfRows() && col >= 0 && col < currentSheet.getNumOfCols());
     }
 }

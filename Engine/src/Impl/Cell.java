@@ -20,6 +20,15 @@ public class Cell implements Editable {
 
     @Override
     public String toString() {
+        StringBuilder str = new StringBuilder();
+        str.append("Original Value: ").append(OriginalValue).append("\n");
+        str.append("Effective Value: ").append(EffectiveValue).append("\n");
+        str.append("Last Version The Cell Was Changed: ").append(version).append("\n");
+
+        return str.toString();
+    }
+
+    public String getCellEffectiveValue(){
         return EffectiveValue;
     }
 }
