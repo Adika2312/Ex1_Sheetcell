@@ -1,5 +1,5 @@
 package api;
 
 public interface Editable {
-    void edit();
+    void update(CellValue value);
 }

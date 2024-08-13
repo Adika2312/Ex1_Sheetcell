@@ -7,6 +7,7 @@ public interface Engine {
     SheetData getSheetDTO();
     String getCellValue(int row, int col);
     boolean isCellInBounds(int row, int col);
-    //void updateCellValue(int row, int column, String value);
+    void updateCellValue(int row, int column, CellValue value);
+    CellData getCellDTO(int row, int col);
     //List<Version> getDocumentVersions(String documentTitle);
 }

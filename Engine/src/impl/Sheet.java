@@ -1,16 +1,18 @@
 package impl;
 
+import api.CellValue;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class Sheet {
-    private String name="Baby";
-    private int version=1;
+    private String name = "Baby";
+    private int version = 1;
     private final List<List<Cell>> cells = new ArrayList<>();
-    private int numOfRows=12;
-    private int numOfCols=10;
-    private float rowHeight=2;
-    private float colWidth=4;
+    private int numOfRows = 12;
+    private int numOfCols = 10;
+    private float rowHeight = 2;
+    private float colWidth = 4;
 
     public Sheet(){
         for(int i=0;i<numOfRows;i++){
@@ -73,8 +75,17 @@ public class Sheet {
         return count;
     }
 
+    public Cell getCell(int row, int col){
+        return cells.get(row).get(col);
+    }
+
     public String getCellValues(int row, int col) {
-        return cells.get(row).get(col).toString();
+        return getCell(row,col).toString();
+    }
+
+    public void setCellValues(int row, int col, CellValue value) {
+        getCell(row,col).update(value);
+        version++;
     }
 
     public int getNumOfRows() {

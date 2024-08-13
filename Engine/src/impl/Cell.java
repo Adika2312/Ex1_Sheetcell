@@ -1,39 +1,34 @@
 package impl;
 
+import api.CellValue;
 import api.Editable;
-
-import java.util.HashMap;
-import java.util.Map;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Cell implements Editable {
-    private String OriginalValue = "*";
-    private String EffectiveValue = " ";
+    private CellValue value = new StringValue(" ");
     private String Identity;
-    private final Map<String,Cell> id2DepedentCell = new HashMap<>();
-    private final Map<String,Cell> id2InfluencedCell = new HashMap<>();
-    private int version;
+    private final Set<Cell> id2DepedentCell = new HashSet<>();
+    private final Set<Cell> id2InfluencedCell = new HashSet<>();
+    private int version = 1;
 
     @Override
-    public void edit() {
-
+    public void update(CellValue value) {
+        this.value = value;
+        version++;
     }
 
     @Override
     public String toString() {
         StringBuilder str = new StringBuilder();
-        str.append("Original Value: ").append(OriginalValue).append("\n");
-        str.append("Effective Value: ").append(EffectiveValue).append("\n");
-        //str.append("Last Version The Cell Was Changed: ").append(version).append("\n");
+        str.append("Effective Value: ").append(value.getFormattedValue()).append("\n");
+        str.append("Original Value: ").append(value.getRawValue());
 
         return str.toString();
     }
 
     public String getCellEffectiveValue(){
-        return EffectiveValue;
-    }
-
-    public String getOriginalValue() {
-        return OriginalValue;
+        return value.getFormattedValue();
     }
 
     public int getVersion() {

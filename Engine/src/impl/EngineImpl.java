@@ -1,8 +1,6 @@
 package impl;
 
-import api.Engine;
-import api.SheetData;
-import api.DTOFactory;
+import api.*;
 
 public class EngineImpl implements Engine {
     private Sheet currentSheet = new Sheet();
@@ -13,6 +11,13 @@ public class EngineImpl implements Engine {
         if(currentSheet == null)
             throw new NullPointerException("You must load a file first.");
         return DTOFactory.createSheetData(currentSheet);
+    }
+
+    @Override
+    public CellData getCellDTO(int row, int col) {
+        if(currentSheet == null)
+            throw new NullPointerException("You must load a file first.");
+        return DTOFactory.createCellData(currentSheet.getCell(row, col));
     }
 
     public EngineImpl(DTOFactory DTOFactory) {
@@ -33,6 +38,8 @@ public class EngineImpl implements Engine {
         return(row >= 0 && row < currentSheet.getNumOfRows() && col >= 0 && col < currentSheet.getNumOfCols());
     }
 
-
-
+    @Override
+    public void updateCellValue(int row, int col, CellValue value) {
+        currentSheet.setCellValues(row, col, value);
+    }
 }
