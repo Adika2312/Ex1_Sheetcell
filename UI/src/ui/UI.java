@@ -1,12 +1,16 @@
-import API.Engine;
-import Impl.EngineImpl;
+package ui;
+
+import api.Engine;
+import dto.DTOFactoryImpl;
+import impl.EngineImpl;
+import utility.CellCoord;
 
 import java.util.InputMismatchException;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 
 public class UI {
-    Engine engine = new EngineImpl();
+    Engine engine = new EngineImpl(new DTOFactoryImpl());
     Boolean isProgramRunning = true;
 
     public enum MenuOptions {
@@ -56,7 +60,7 @@ Welcome to the Sheetcell!
                         PrintCell();
                         break;
                     case UPDATE_CELL:
-                        System.out.println("Updating cell...");
+                        UpdateCell();
                         break;
                     case DISPLAY_VERSIONS:
                         System.out.println("Displaying versions...");
@@ -83,16 +87,31 @@ Welcome to the Sheetcell!
         }
     }
 
-    private void PrintCell() {
+    private void UpdateCell() {
+        CellCoord cellInput =  getCheckAndPrintBasicCellInfo("update its value:");
 
-        Scanner scanner = new Scanner(System.in);
-        String cellIdentity;
+    }
+
+    private void PrintCell() {
+        CellCoord cellInput =  getCheckAndPrintBasicCellInfo("view its value and status:");
+    }
+
+    private CellCoord getCheckAndPrintBasicCellInfo(String massage){
+        CellCoord cellInput = getAndCheckCellInput(massage);
+        System.out.println("Cell Identity: " + cellInput.getIdentity());
+        System.out.println(engine.getCellValue(cellInput.getRow(), cellInput.getCol()));
+        return cellInput;
+    }
+
+    private CellCoord getAndCheckCellInput(String massage) {
         Pattern cellPattern = Pattern.compile("^[A-Z]+[1-9][0-9]*$");
         int col;
         int row;
+        String cellIdentity;
+        Scanner scanner = new Scanner(System.in);
 
         while(true){
-            System.out.println("Please enter the cell identity (e.g., A4) to view its value and status:");
+            System.out.println("Please enter the cell identity (e.g., A4) to " + massage);
             cellIdentity = scanner.nextLine().trim();
 
             if (cellPattern.matcher(cellIdentity).matches()) {
@@ -101,7 +120,7 @@ Welcome to the Sheetcell!
                 col = extractColumn(columnString);
                 row = extractRow(rowString);
 
-                if(engine.IsCellInBounds(row, col)){
+                if(engine.isCellInBounds(row, col)){
                     break;
                 }
                 else{
@@ -113,8 +132,7 @@ Welcome to the Sheetcell!
             }
         }
 
-        System.out.println("Cell Identity: " + cellIdentity);
-        System.out.println(engine.getCellValue(row, col));
+        return new CellCoord(row, col, cellIdentity);
     }
 
     private static int extractRow(String cellName) {
@@ -145,7 +163,7 @@ Please enter the option's number you wish to use:""");
 
     private void PrintSheet() {
         try {
-            System.out.println(engine.GetSheet().toString());
+            System.out.println(engine.getSheetDTO().toString());
         }
         catch (NullPointerException e) {
             System.out.println(e.getMessage());

@@ -1,4 +1,4 @@
-package Impl;
+package impl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +19,10 @@ public class Sheet {
                 cells.get(i).add(new Cell());
             }
         }
+    }
+
+    public List<List<Cell>> getCells() {
+        return cells;
     }
 
     @Override
@@ -69,7 +73,7 @@ public class Sheet {
         return count;
     }
 
-    public String getCellData(int row, int col) {
+    public String getCellValues(int row, int col) {
         return cells.get(row).get(col).toString();
     }
 
@@ -80,4 +84,24 @@ public class Sheet {
     public int getNumOfCols() {
         return numOfCols;
     }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getVersion(){
+        return version;
+    }
+
+//    public SheetDTO toDTO() {
+//        List<List<String>> dtoCells = new ArrayList<>();
+//        for (List<Cell> row : cells) {
+//            List<String> dtoRow = new ArrayList<>();
+//            for (Cell cell : row) {
+//                dtoRow.add(cell.getCellEffectiveValue());
+//            }
+//            dtoCells.add(dtoRow);
+//        }
+//        return new SheetDTO(name, version, numOfRows, numOfCols, dtoCells);
+//    }
 }

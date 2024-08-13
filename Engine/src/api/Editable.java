@@ -1,5 +1,5 @@
-package API;
+package api;
 
 public interface Editable {
-    void Edit();
+    void edit();
 }
