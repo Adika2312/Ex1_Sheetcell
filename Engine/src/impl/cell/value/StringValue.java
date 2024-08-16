@@ -16,7 +16,7 @@ public class StringValue implements CellValue {
 
 
     @Override
-    public CellValue eval() {
-        return this;
+    public String eval() {
+        return this.value;
     }
 }

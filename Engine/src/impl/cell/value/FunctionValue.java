@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
 public class FunctionValue implements CellValue {
     private final FunctionType functionType;
     List<CellValue> arguments = new ArrayList<>();
-    private double effectiveValue;
+    private final Object effectiveValue;
 
 
     public FunctionValue(String functionDefinition) {
@@ -22,7 +22,7 @@ public class FunctionValue implements CellValue {
             CellValue value = EngineImpl.convertStringToCellValue(argument);
             arguments.add(value);
         }
-        effectiveValue = (double) this.eval();
+        effectiveValue = this.eval();
     }
 
     public static List<String> extractArguments(String input) {
@@ -91,7 +91,23 @@ public class FunctionValue implements CellValue {
                 } catch (ArithmeticException e) {
                     return "NaN";
                 }
-
+            case CONCAT:
+                String str1 = (String) arguments.get(0).eval();
+                String str2 = (String) arguments.get(1).eval();
+                try {
+                    return functionType.apply(str1, str2);
+                } catch (ArithmeticException e) {
+                    return "NaN";
+                }
+            case SUB:
+                String str = (String) arguments.get(0).eval();
+                int idx1 =  ((Double) arguments.get(1).eval()).intValue();
+                int idx2 =  ((Double) arguments.get(2).eval()).intValue();
+                try {
+                    return functionType.apply(str,idx1,idx2);
+                } catch (ArithmeticException e) {
+                    return "NaN";
+                }
         }
         return null;
     }
