@@ -1,9 +1,9 @@
 package api;
 
-import impl.Cell;
-import impl.Sheet;
+import impl.cell.Cell;
+import impl.sheet.Sheet;
 
 public interface DTOFactory {
-    SheetData createSheetData(Sheet sheet);
-    CellData createCellData(Cell cell);
+    DTO createSheetData(Sheet sheet);
+    DTO createCellData(Cell cell);
 }

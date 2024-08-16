@@ -1,13 +1,13 @@
 package dto;
 
-import api.SheetData;
-import impl.Cell;
-import impl.Sheet;
+import api.DTO;
+import impl.cell.Cell;
+import impl.sheet.Sheet;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class SheetDTO implements SheetData {
+public class SheetDTO implements DTO {
     private final String name;
     private final int version;
     private final int numOfRows;

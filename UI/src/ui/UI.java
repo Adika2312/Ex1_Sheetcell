@@ -4,6 +4,10 @@ import api.CellValue;
 import api.Engine;
 import dto.DTOFactoryImpl;
 import impl.*;
+import impl.cell.value.BooleanValue;
+import impl.cell.value.FunctionValue;
+import impl.cell.value.NumericValue;
+import impl.cell.value.StringValue;
 import utility.CellCoord;
 
 import java.util.InputMismatchException;
@@ -92,49 +96,11 @@ Welcome to the Sheetcell!
         CellCoord cellInput =  getCheckAndPrintBasicCellInfo("update its value:");
         System.out.println("\nPlease enter a new value for the cell:");
         Scanner scanner = new Scanner(System.in);
-        String newValue = scanner.nextLine();
-        CellValue newCellValue = convertStringToCellValue(newValue);
-        engine.updateCellValue(cellInput.getRow(), cellInput.getCol(), newCellValue);
+        String orgValue = scanner.nextLine();
+        CellValue newCellValue = EngineImpl.convertStringToCellValue(orgValue);
+        engine.updateCellValue(cellInput.getRow(), cellInput.getCol(), newCellValue, orgValue);
     }
 
-    private CellValue convertStringToCellValue(String newValue) {
-
-        CellValue cellValue = null;
-
-        while (true){
-            // Check for Boolean
-            if (newValue.equals("TRUE") || newValue.equals("FALSE")) {
-                cellValue = new BooleanValue(Boolean.parseBoolean(newValue));
-            }
-            // Check for Numerical
-            else if (newValue.matches("-?\\d+(\\.\\d+)?")) {
-                try {
-                    double numericValue = Double.parseDouble(newValue);
-                    cellValue = new NumericValue(numericValue);
-                }
-                catch (NumberFormatException e) {
-                    System.out.println("Invalid numeric value.");
-                }
-            }
-            // Check for Function
-            else if (newValue.matches("\\{[A-Z]+(,[^,]+)*\\}")) {
-                cellValue = new FunctionValue(newValue);
-            }
-            // Otherwise, treat as String
-            else {
-                cellValue = new StringValue(newValue);
-            }
-
-            if (cellValue.isValid()) {
-                break;
-            }
-            else {
-                System.out.println("Invalid value entered.");
-            }
-        }
-
-        return cellValue;
-    }
 
     private void PrintCell() {
         CellCoord cellInput =  getCheckAndPrintBasicCellInfo("view its value and status:");

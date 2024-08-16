@@ -1,4 +1,4 @@
-package impl;
+package impl.cell.value;
 
 import api.CellValue;
 
@@ -10,18 +10,13 @@ public class StringValue implements CellValue {
     }
 
     @Override
-    public String getFormattedValue() {
+    public String getEffectiveValue() {
         return value;
     }
 
-    @Override
-    public String getRawValue() {
-        return value;
-    }
 
     @Override
-    public boolean isValid() {
-        // Add validation logic if needed
-        return true;
+    public CellValue eval() {
+        return this;
     }
 }

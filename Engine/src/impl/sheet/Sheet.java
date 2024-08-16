@@ -1,6 +1,7 @@
-package impl;
+package impl.sheet;
 
 import api.CellValue;
+import impl.cell.Cell;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -83,8 +84,8 @@ public class Sheet {
         return getCell(row,col).toString();
     }
 
-    public void setCellValues(int row, int col, CellValue value) {
-        getCell(row,col).update(value);
+    public void setCellValues(int row, int col, CellValue value, String originalValue) {
+        getCell(row,col).update(value, originalValue);
         version++;
     }
 
@@ -104,15 +105,5 @@ public class Sheet {
         return version;
     }
 
-//    public SheetDTO toDTO() {
-//        List<List<String>> dtoCells = new ArrayList<>();
-//        for (List<Cell> row : cells) {
-//            List<String> dtoRow = new ArrayList<>();
-//            for (Cell cell : row) {
-//                dtoRow.add(cell.getCellEffectiveValue());
-//            }
-//            dtoCells.add(dtoRow);
-//        }
-//        return new SheetDTO(name, version, numOfRows, numOfCols, dtoCells);
-//    }
+
 }

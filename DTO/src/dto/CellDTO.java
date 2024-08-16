@@ -1,9 +1,9 @@
 package dto;
 
-import api.CellData;
-import impl.Cell;
+import api.DTO;
+import impl.cell.Cell;
 
-public class CellDTO implements CellData {
+public class CellDTO implements DTO {
     private final int version;
 
     public CellDTO(Cell cell) {

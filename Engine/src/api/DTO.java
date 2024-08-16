@@ -1,6 +1,6 @@
 package api;
 
-public interface CellData {
+public interface DTO {
     String toString();
     int getVersion();
 }

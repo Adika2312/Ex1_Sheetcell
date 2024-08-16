@@ -1,4 +1,4 @@
-package impl;
+package impl.cell.value;
 
 import api.CellValue;
 
@@ -10,7 +10,7 @@ public class NumericValue implements CellValue {
     }
 
     @Override
-    public String getFormattedValue() {
+    public String getEffectiveValue() {
         if (value % 1 == 0) {
             return String.format("%,d", value.longValue());
         } else {
@@ -19,15 +19,7 @@ public class NumericValue implements CellValue {
     }
 
     @Override
-    public Double getRawValue() {
+    public Double eval() {
         return value;
     }
-
-    @Override
-    public boolean isValid() {
-        // Add validation logic if needed
-        return true;
-    }
-
-
 }

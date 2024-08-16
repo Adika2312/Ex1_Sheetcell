@@ -1,7 +1,7 @@
 package api;
 
 public interface CellValue {
-    String getFormattedValue();
-    Object getRawValue();
-    boolean isValid();
+    Object getEffectiveValue();
+    Object eval();
 }
+
