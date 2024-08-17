@@ -87,7 +87,7 @@ Welcome to the Sheetcell!
             scanner.nextLine();
         }
         catch(Exception e) {
-            System.out.println("Unknown error.");
+            System.out.println(e.getMessage());
             scanner.nextLine();
         }
     }

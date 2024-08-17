@@ -16,8 +16,8 @@ public class FunctionValue implements CellValue {
 
 
     public FunctionValue(String functionDefinition) {
-        functionType = parseFunctionType(functionDefinition);
         List<String> argsStr = extractArguments(functionDefinition);
+        functionType = parseFunctionType(argsStr.getFirst());
         for (String argument : argsStr.subList(1, argsStr.size())) {
             CellValue value = EngineImpl.convertStringToCellValue(argument);
             arguments.add(value);
@@ -77,37 +77,45 @@ public class FunctionValue implements CellValue {
             case DIVIDE:
             case MOD:
             case POW:
-                double arg1 = (double) arguments.get(0).eval();
-                double arg2 = (double) arguments.get(1).eval();
                 try {
+                    checkNumOfArguments(2, "2 arguments");
+                    double arg1 = (double) arguments.get(0).eval();
+                    double arg2 = (double) arguments.get(1).eval();
                     return functionType.apply(arg1, arg2);
-                } catch (ArithmeticException e) {
-                    return "NaN";
+                }
+                catch (ClassCastException e) {
+                    throw new RuntimeException("Error: One or more arguments are not numeric. Ensure that all inputs for this function are numbers.");
                 }
             case ABS:
-                double arg = (double) arguments.get(0).eval();
                 try {
+                    checkNumOfArguments(1, "1 argument");
+                    double arg = (double) arguments.getFirst().eval();
                     return functionType.apply(arg);
-                } catch (ArithmeticException e) {
-                    return "NaN";
+                }
+                catch (ClassCastException e) {
+                    throw new RuntimeException("Error: argument is not numeric. Ensure that all inputs for this function are numbers.");
                 }
             case CONCAT:
-                String str1 = (String) arguments.get(0).eval();
-                String str2 = (String) arguments.get(1).eval();
+                checkNumOfArguments(2, "2 arguments");
                 try {
+                    String str1 = (String) arguments.get(0).eval();
+                    String str2 = (String) arguments.get(1).eval();
                     return functionType.apply(str1, str2);
-                } catch (ArithmeticException e) {
-                    return "NaN";
+                }
+                catch (ClassCastException e) {
+                    throw new RuntimeException("Error: One or more arguments are not valid text. Please check that all arguments are correctly formatted as text.");
                 }
             case SUB:
-                String str = (String) arguments.get(0).eval();
-                int idx1 =  ((Double) arguments.get(1).eval()).intValue();
-                int idx2 =  ((Double) arguments.get(2).eval()).intValue();
+                checkNumOfArguments(3, "3 arguments");
                 try {
+                    String str = (String) arguments.get(0).eval();
+                    int idx1 =  ((Double) arguments.get(1).eval()).intValue();
+                    int idx2 =  ((Double) arguments.get(2).eval()).intValue();
                     return functionType.apply(str,idx1,idx2);
-                } catch (ArithmeticException e) {
-                    return "NaN";
                 }
+                catch (ClassCastException e) {
+                    throw new RuntimeException("Error: One or more arguments are not valid. Please check that all arguments are correctly formatted.");
+                }//TODO
         }
         return null;
     }
@@ -193,6 +201,12 @@ public class FunctionValue implements CellValue {
         }
     }
 
+    private void checkNumOfArguments(int numOfArgumentsExp, String numArgsStr) throws IllegalArgumentException {
+        if (arguments.size() != numOfArgumentsExp) {
+            throw new IllegalArgumentException("Error: Function " + functionType.name() + " expected " + numArgsStr + ", got " + arguments.size() + ".");
+        }
+    }
+
     @Override
     public Object getEffectiveValue() {
         return effectiveValue;
@@ -202,13 +216,12 @@ public class FunctionValue implements CellValue {
         return functionType != null;
     }
 
-    private FunctionType parseFunctionType(String functionDefinition) {
-        String functionName = functionDefinition.substring(1, functionDefinition.indexOf(','));
+    private FunctionType parseFunctionType(String functionName) {
         try {
             return FunctionType.valueOf(functionName);
         }
         catch (IllegalArgumentException e) {
-            return null;
+            throw new RuntimeException("Invalid function definition: " + functionName);
         }
     }
 
