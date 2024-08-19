@@ -1,9 +1,12 @@
 package ui;
 
 import api.CellValue;
+import api.DTO;
 import api.Engine;
 import dto.DTOFactoryImpl;
+import dto.SheetDTO;
 import impl.*;
+import impl.cell.Cell;
 import impl.cell.value.BooleanValue;
 import impl.cell.value.FunctionValue;
 import impl.cell.value.NumericValue;
@@ -11,6 +14,7 @@ import impl.cell.value.StringValue;
 import utility.CellCoord;
 
 import java.util.InputMismatchException;
+import java.util.List;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 
@@ -109,7 +113,7 @@ Welcome to the Sheetcell!
         System.out.println("\nPlease enter a new value for the cell:");
         Scanner scanner = new Scanner(System.in);
         String orgValue = scanner.nextLine();
-        CellValue newCellValue = EngineImpl.convertStringToCellValue(orgValue);
+        CellValue newCellValue = convertStringToCellValue(orgValue);
         engine.updateCellValue(cellInput.getRow(), cellInput.getCol(), newCellValue, orgValue);
     }
 
@@ -187,10 +191,97 @@ Please enter the option's number you wish to use:""");
 
     private void PrintSheet() {
         try {
-            System.out.println(engine.getSheetDTO().toString());
+            String SheetDataToPrint = convertSheetDTOToString((SheetDTO) engine.getSheetDTO());
+            System.out.println(SheetDataToPrint);
         }
         catch (NullPointerException e) {
             System.out.println(e.getMessage());
         }
+    }
+
+    private String convertSheetDTOToString(SheetDTO sheetDTO) {
+        StringBuilder sb = new StringBuilder();
+        int rowsCounter = 1;
+        char colCounter = 'A';
+        int widthOfFirstCol = countDigits(sheetDTO.getNumOfRows());
+
+        sb.append("Name: ").append(sheetDTO.getName()).append("\n");
+        sb.append("Version: ").append(sheetDTO.getVersion()).append("\n");
+        sb.append(String.format("%" + (widthOfFirstCol+2) + "s", ""));
+
+        for(int i=0;i<sheetDTO.getNumOfCols();i++){
+            sb.append(String.format("%-" + (int) (sheetDTO.getColWidth()+1) + "s", colCounter++));
+        }
+        sb.append("\n");
+
+        for (List<Cell> row : sheetDTO.getCells()) {
+            sb.append(String.format("%0" + widthOfFirstCol + "d", rowsCounter++)).append(" ");
+            for (Cell cell : row) {
+                String cellValue = cell.getCellEffectiveValue();
+
+                if (cellValue.length() > sheetDTO.getColWidth()) {
+                    cellValue = cellValue.substring(0, (int) sheetDTO.getColWidth());
+                }
+                sb.append(String.format("|" + "%-" + (int) sheetDTO.getColWidth() + "s", cellValue));
+            }
+            sb.append("|\n");
+            for(int j=0;j<sheetDTO.getRowHeight()-1;j++){
+                sb.append("\n");
+            }
+        }
+
+        return sb.toString();
+    }
+
+    public static int countDigits(int number) {
+        if (number == 0) {
+            return 1;
+        }
+
+        int count = 0;
+        while (number != 0) {
+            number /= 10;
+            count++;
+        }
+        return count;
+    }
+
+    public static CellValue convertStringToCellValue(String newValue) {
+
+        CellValue cellValue = null;
+
+        while (true){
+            // Check for Boolean
+            if (newValue.equals("TRUE") || newValue.equals("FALSE")) {
+                cellValue = new BooleanValue(Boolean.parseBoolean(newValue));
+            }
+            // Check for Numerical
+            else if (newValue.matches("-?\\d+(\\.\\d+)?")) {
+                try {
+                    double numericValue = Double.parseDouble(newValue);
+                    cellValue = new NumericValue(numericValue);
+                }
+                catch (NumberFormatException e) {
+                    System.out.println("Invalid numeric value.");
+                }
+            }
+            // Check for Function
+            else if (newValue.matches("\\{[A-Z]+(,[^,]+)*\\}")) {
+                cellValue = new FunctionValue(newValue);
+            }
+            // Otherwise, treat as String
+            else {
+                cellValue = new StringValue(newValue);
+            }
+
+            if (true) {
+                break;
+            }
+            else {
+                System.out.println("Invalid value entered.");
+            }
+        }
+
+        return cellValue;
     }
 }

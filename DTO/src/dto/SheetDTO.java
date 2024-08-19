@@ -13,16 +13,19 @@ public class SheetDTO implements DTO {
     private final int numOfRows;
     private final int numOfCols;
     private final List<List<Cell>> cellsDTO;
-    private final String data;
+    private final int rowHeight;
+    private final int colWidth;
+
 
     public SheetDTO(Sheet sheet) {
         name = sheet.getName();
         version = sheet.getVersion();
         numOfRows = sheet.getNumOfRows();
         numOfCols = sheet.getNumOfCols();
-        data = sheet.toString();
         List<List<Cell>> cellsToCopy = sheet.getCells();
         cellsDTO = new ArrayList<>();
+        rowHeight = sheet.getRowHeight();
+        colWidth = sheet.getColWidth();
 
         for (List<Cell> innerList : cellsToCopy) {
             cellsDTO.add(new ArrayList<>(innerList));
@@ -45,12 +48,12 @@ public class SheetDTO implements DTO {
         return numOfCols;
     }
 
+    public float getRowHeight() {return rowHeight;}
+
+    public float getColWidth() {return colWidth;}
+
     public List<List<Cell>> getCells() {
         return cellsDTO;
     }
 
-    @Override
-    public String toString() {
-        return data;
-    }
 }
