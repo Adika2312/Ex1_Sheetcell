@@ -1,15 +1,34 @@
 package impl;
 
 import api.*;
+import generated.STLSheet;
 import impl.cell.value.BooleanValue;
 import impl.cell.value.FunctionValue;
 import impl.cell.value.NumericValue;
 import impl.cell.value.StringValue;
 import impl.sheet.Sheet;
+import jakarta.xml.bind.JAXB;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Unmarshaller;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 
 public class EngineImpl implements Engine {
-    private Sheet currentSheet = new Sheet();
+    private Sheet currentSheet;
     private final DTOFactory DTOFactory;
+    private final String JAXB_XML_PACKAGE_NAME = "generated";
+
+    @Override
+    public void loadFile(String filePath) throws IOException, JAXBException {
+        InputStream inputStream = new FileInputStream(filePath);
+        JAXBContext jc = JAXBContext.newInstance(JAXB_XML_PACKAGE_NAME);
+        Unmarshaller unmarshaller = jc.createUnmarshaller();
+        STLSheet currentSTLSheet = (STLSheet) unmarshaller.unmarshal(inputStream);
+    }
 
     @Override
     public DTO getSheetDTO() {

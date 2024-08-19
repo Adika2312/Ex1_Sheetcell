@@ -1,9 +1,12 @@
 package api;
 
 
+import jakarta.xml.bind.JAXBException;
+
+import java.io.IOException;
 
 public interface Engine {
-    //void loadSystemFile(String filePath);
+    void loadFile(String filePath) throws IOException, JAXBException;
     DTO getSheetDTO();
     String getCellValue(int row, int col);
     boolean isCellInBounds(int row, int col);

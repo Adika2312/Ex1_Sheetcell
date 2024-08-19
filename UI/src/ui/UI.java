@@ -56,7 +56,7 @@ Welcome to the Sheetcell!
 
                 switch (option) {
                     case LOAD_FILE:
-                        System.out.println("Loading file...");
+                        loadFile();
                         break;
                     case DISPLAY_SHEET:
                         PrintSheet();
@@ -89,6 +89,18 @@ Welcome to the Sheetcell!
         catch(Exception e) {
             System.out.println(e.getMessage());
             scanner.nextLine();
+        }
+    }
+
+    private void loadFile() {
+        System.out.println("Please enter a file path to load:");
+        Scanner scanner = new Scanner(System.in);
+        String filePath = scanner.nextLine();
+        try {
+            engine.loadFile(filePath);
+        }
+        catch (Exception e) {
+            System.out.println(e.getMessage());
         }
     }
 
