@@ -1,6 +1,10 @@
 package impl;
 
 import api.*;
+import exception.CellOutOfBoundsException;
+import exception.FileNotXMLException;
+import exception.InvalidSheetSizeException;
+import generated.STLCell;
 import generated.STLSheet;
 import impl.cell.Cell;
 import impl.cell.value.BooleanValue;
@@ -12,9 +16,8 @@ import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Unmarshaller;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import java.util.List;
 
 public class EngineImpl implements Engine {
     private Sheet currentSheet;
@@ -26,15 +29,22 @@ public class EngineImpl implements Engine {
     }
 
     @Override
-    public void loadFile(String filePath) throws IOException {
-        STLSheet currentSTLSheet;
-        try {
-            currentSTLSheet = buildSTLSheetFromXML(filePath);
-        }
-        catch (JAXBException e) {
-            throw new RuntimeException(e);
-        }
+    public void loadFile(String filePath) throws IOException, JAXBException {
+
+        checkIfFilePathValid(filePath);
+        STLSheet currentSTLSheet = buildSTLSheetFromXML(filePath);
         buildSheetFromSTLSheet(currentSTLSheet);
+
+    }
+
+    private void checkIfFilePathValid(String filePath) throws FileNotFoundException, FileNotXMLException {
+        File file = new File(filePath);
+        if(!file.exists()){
+            throw new FileNotFoundException("File is not found in the file path given.");
+        }
+        if(!file.getName().endsWith(".xml")){
+            throw new FileNotXMLException();
+        }
     }
 
     @Override
@@ -45,15 +55,56 @@ public class EngineImpl implements Engine {
         return (STLSheet) unmarshaller.unmarshal(inputStream);
     }
 
+
     @Override
     public void buildSheetFromSTLSheet(STLSheet currentSTLSheet) {
+        checkDataValidity(currentSTLSheet);
         currentSheet = new Sheet();
+
         currentSheet.setName(currentSTLSheet.getName());
         currentSheet.setNumOfCols(currentSTLSheet.getSTLLayout().getColumns());
         currentSheet.setNumOfRows(currentSTLSheet.getSTLLayout().getRows());
         currentSheet.setColWidth(currentSTLSheet.getSTLLayout().getSTLSize().getColumnWidthUnits());
         currentSheet.setRowHeight(currentSTLSheet.getSTLLayout().getSTLSize().getRowsHeightUnits());
         currentSheet.setActiveCells(currentSTLSheet.getSTLCells().getSTLCell());
+    }
+
+
+    private void checkDataValidity(STLSheet currentSTLSheet) {
+        checkSheetSize(currentSTLSheet.getSTLLayout().getRows(), currentSTLSheet.getSTLLayout().getColumns());
+        checkCellsWithinBounds(currentSTLSheet);
+    }
+
+    private void checkSheetSize(int rows, int columns) {
+        if (rows < 1 || rows > 50 || columns < 1 || columns > 20) {
+            throw new InvalidSheetSizeException("The sheet size is out of valid bounds.");
+        }
+    }
+
+    private void checkCellsWithinBounds(STLSheet sheet) {
+        int rowCount = sheet.getSTLLayout().getRows();
+        int columnCount = sheet.getSTLLayout().getColumns();
+
+        List<STLCell> cells = sheet.getSTLCells().getSTLCell();
+
+        for (STLCell cell : cells) {
+            int row = cell.getRow();
+            String columnLetter = cell.getColumn();
+
+            int column = convertColumnLetterToNumber(columnLetter);
+
+            if (row < 1 || row > rowCount || column < 1 || column > columnCount) {
+                throw new CellOutOfBoundsException("A cell is defined outside the sheet boundaries: (" + row + ", " + columnLetter + ")");
+            }
+        }
+    }
+
+    private int convertColumnLetterToNumber(String columnLetter) {
+        if (columnLetter == null || columnLetter.length() != 1 || !Character.isUpperCase(columnLetter.charAt(0))) {
+            throw new IllegalArgumentException("Invalid column letter: " + columnLetter);
+        }
+
+        return columnLetter.charAt(0) - 'A' + 1;
     }
 
     @Override
@@ -69,7 +120,7 @@ public class EngineImpl implements Engine {
             throw new NullPointerException("You must load a file first.");
         Cell currentCell = currentSheet.getCell(cellIdentity);
         if(currentCell == null)
-            return null;
+            return DTOFactory.createEmptyCellDTO();
         return DTOFactory.createCellDTO(currentSheet.getCell(cellIdentity));
     }
 
@@ -80,7 +131,7 @@ public class EngineImpl implements Engine {
 
     @Override
     public void updateCellValue(String cellIdentity, CellValue value, String originalValue) {
-        currentSheet.setCellValues(cellIdentity, value, originalValue);
+        currentSheet.setCellValues(cellIdentity, value, originalValue, false);
     }
 
     public static CellValue convertStringToCellValue(String newValue) {

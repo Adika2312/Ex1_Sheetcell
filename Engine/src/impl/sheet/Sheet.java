@@ -28,21 +28,22 @@ public class Sheet {
         return activeCells.get(cellIdentity);
     }
 
-    public void setCellValues(String cellIdentity, CellValue value, String originalValue) {
+    public void setCellValues(String cellIdentity, CellValue value, String originalValue, boolean isFromFile) {
         Cell cell = getCell(cellIdentity);
         if (cell == null){
-            createNewCell(cellIdentity, value, originalValue);
+            createNewCell(cellIdentity, value, originalValue, isFromFile);
         }
         else{
-            cell.update(value,originalValue);
+            cell.update(value,originalValue,isFromFile);
         }
         version++;
     }
 
-    private void createNewCell(String cellIdentity, CellValue value, String originalValue) {
+    private void createNewCell(String cellIdentity, CellValue value, String originalValue, boolean isFromFile) {
         Cell cell = new Cell();
         activeCells.put(cellIdentity, cell);
-        cell.update(value,originalValue);
+        cell.update(value, originalValue, isFromFile);
+
     }
 
     public int getNumOfRows() {
@@ -86,12 +87,11 @@ public class Sheet {
         this.rowHeight = rowHeight;
     }
 
-
     public void setActiveCells(List<STLCell> stlCellsList) {
         for (STLCell stlCell : stlCellsList) {
             String cellIdentity = stlCell.getColumn() + stlCell.getRow();
             String orgValue = stlCell.getSTLOriginalValue();
-            createNewCell(cellIdentity, EngineImpl.convertStringToCellValue(orgValue), orgValue);
+            createNewCell(cellIdentity, EngineImpl.convertStringToCellValue(orgValue), orgValue, true);
         }
     }
 }

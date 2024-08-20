@@ -15,4 +15,9 @@ public class DTOFactoryImpl implements DTOFactory {
     public DTO createCellDTO(Cell cell) {
         return new CellDTO(cell);
     }
+
+    @Override
+    public DTO createEmptyCellDTO() {
+        return new CellDTO();
+    }
 }

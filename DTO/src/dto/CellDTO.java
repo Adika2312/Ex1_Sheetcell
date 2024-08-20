@@ -15,6 +15,11 @@ public class CellDTO implements DTO {
 //    private final Set<Cell> id2DepedentCell = new HashSet<>();
 //    private final Set<Cell> id2InfluencedCell = new HashSet<>();
 
+    public CellDTO(){
+        this.version = 1;
+        this.effectiveValue = new StringValue("");
+        this.originalValue = "";
+    }
 
     public CellDTO(Cell cell) {
         version = cell.getVersion();

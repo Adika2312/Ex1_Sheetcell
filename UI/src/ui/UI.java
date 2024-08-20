@@ -5,10 +5,11 @@ import api.Engine;
 import dto.CellDTO;
 import dto.DTOFactoryImpl;
 import dto.SheetDTO;
+import exception.FileNotXMLException;
 import impl.*;
-import impl.cell.Cell;
 import utility.CellCoord;
 
+import java.io.FileNotFoundException;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 import java.util.regex.Pattern;
@@ -97,6 +98,10 @@ Welcome to the Sheetcell!
         String filePath = scanner.nextLine();
         try {
             engine.loadFile(filePath);
+            System.out.println("File loaded successfully.");
+        }
+        catch(FileNotFoundException | FileNotXMLException e){
+            System.out.println(e.getMessage());
         }
         catch (Exception e) {
             System.out.println(e.getMessage());
@@ -144,8 +149,8 @@ Welcome to the Sheetcell!
     private String convertCellDTOToString(String cellIdentity) {
         StringBuilder sb = new StringBuilder();
         CellDTO cellDTO = (CellDTO) engine.getCellDTO(cellIdentity);
-        sb.append("Cell Identity: ").append(cellIdentity);
-        sb.append("Effective Value: ").append(cellDTO.getEffectiveValue()).append("\n");
+        sb.append("Cell Identity: ").append(cellIdentity).append("\n");
+        sb.append("Effective Value: ").append(cellDTO.getEffectiveValue().getEffectiveValue()).append("\n");
         sb.append("Original Value: ").append(cellDTO.getOriginalValue());
         return sb.toString();
     }

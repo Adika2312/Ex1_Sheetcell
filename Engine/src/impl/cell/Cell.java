@@ -14,10 +14,11 @@ public class Cell implements Editable {
     private int version = 1;
 
     @Override
-    public void update(CellValue value, String originalValue) {
+    public void update(CellValue value, String originalValue, boolean isFromFile) {
         this.effectiveValue = value;
         this.originalValue = originalValue;
-        version++;
+        if(!isFromFile)
+            version++;
     }
 
     @Override
@@ -27,10 +28,6 @@ public class Cell implements Editable {
         str.append("Original Value: ").append(originalValue);
 
         return str.toString();
-    }
-
-    public String getCellEffectiveValue(){
-        return effectiveValue.getEffectiveValue().toString();
     }
 
     public int getVersion() {
