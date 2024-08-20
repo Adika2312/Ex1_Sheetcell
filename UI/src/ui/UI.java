@@ -1,20 +1,14 @@
 package ui;
 
 import api.CellValue;
-import api.DTO;
 import api.Engine;
+import dto.CellDTO;
 import dto.DTOFactoryImpl;
 import dto.SheetDTO;
 import impl.*;
-import impl.cell.Cell;
-import impl.cell.value.BooleanValue;
-import impl.cell.value.FunctionValue;
-import impl.cell.value.NumericValue;
-import impl.cell.value.StringValue;
 import utility.CellCoord;
 
 import java.util.InputMismatchException;
-import java.util.List;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 
@@ -113,22 +107,35 @@ Welcome to the Sheetcell!
         System.out.println("\nPlease enter a new value for the cell:");
         Scanner scanner = new Scanner(System.in);
         String orgValue = scanner.nextLine();
-        CellValue newCellValue = convertStringToCellValue(orgValue);
-        engine.updateCellValue(cellInput.getRow(), cellInput.getCol(), newCellValue, orgValue);
+        CellValue newCellValue = EngineImpl.convertStringToCellValue(orgValue);
+        engine.updateCellValue(cellInput.getIdentity(), newCellValue, orgValue);
     }
 
 
     private void PrintCell() {
         CellCoord cellInput =  getCheckAndPrintBasicCellInfo("view its value and status:");
-        int currVersion = engine.getCellDTO(cellInput.getRow(), cellInput.getCol()).getVersion();
+        int currVersion = engine.getCellDTO(cellInput.getIdentity()).getVersion();
         System.out.println("Current version: " + currVersion);
     }
 
     private CellCoord getCheckAndPrintBasicCellInfo(String massage){
         CellCoord cellInput = getAndCheckCellInput(massage);
-        System.out.println("Cell Identity: " + cellInput.getIdentity());
-        System.out.println(engine.getCellValue(cellInput.getRow(), cellInput.getCol()));
+        try {
+            String cellDataToPrint = convertCellDTOToString((CellDTO) engine.getCellDTO(cellInput.getIdentity()));
+            System.out.println(cellDataToPrint);
+        }
+        catch (NullPointerException e) {
+            System.out.println(e.getMessage());
+        }
         return cellInput;
+    }
+
+    private String convertCellDTOToString(CellDTO cellDTO) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Cell Identity: ").append(cellDTO.getIdentity());
+        sb.append("Effective Value: ").append(cellDTO.getEffectiveValue()).append("\n");
+        sb.append("Original Value: ").append(cellDTO.getOriginalValue());
+        return sb.toString();
     }
 
     private CellCoord getAndCheckCellInput(String massage) {
@@ -210,27 +217,44 @@ Please enter the option's number you wish to use:""");
         sb.append(String.format("%" + (widthOfFirstCol+2) + "s", ""));
 
         for(int i=0;i<sheetDTO.getNumOfCols();i++){
-            sb.append(String.format("%-" + (int) (sheetDTO.getColWidth()+1) + "s", colCounter++));
+            sb.append(String.format("%-" + (sheetDTO.getColWidth()+1) + "s", colCounter++));
         }
         sb.append("\n");
 
-        for (List<Cell> row : sheetDTO.getCells()) {
+        for (int i = 0 ; i < sheetDTO.getNumOfRows(); i++) {
             sb.append(String.format("%0" + widthOfFirstCol + "d", rowsCounter++)).append(" ");
-            for (Cell cell : row) {
-                String cellValue = cell.getCellEffectiveValue();
+            for (int j = 0; j < sheetDTO.getNumOfCols(); j++) {
+
+                String cellIdentity = convertRowAndColToString(i,j);
+                String cellValue = createCellValueToPrint(cellIdentity,sheetDTO);
 
                 if (cellValue.length() > sheetDTO.getColWidth()) {
-                    cellValue = cellValue.substring(0, (int) sheetDTO.getColWidth());
+                    cellValue = cellValue.substring(0, sheetDTO.getColWidth());
                 }
-                sb.append(String.format("|" + "%-" + (int) sheetDTO.getColWidth() + "s", cellValue));
+                sb.append(String.format("|" + "%-" + sheetDTO.getColWidth() + "s", cellValue));
             }
             sb.append("|\n");
-            for(int j=0;j<sheetDTO.getRowHeight()-1;j++){
+            for(int j = 0; j < sheetDTO.getRowHeight()-1 ; j++){
                 sb.append("\n");
             }
         }
 
         return sb.toString();
+    }
+
+    private String createCellValueToPrint(String cellIdentity, SheetDTO sheetDTO) {
+        String cellValue = " ";
+        if(sheetDTO.getActiveCells().get(cellIdentity) != null){
+            cellValue = sheetDTO.getActiveCells().get(cellIdentity).getEffectiveValue().getEffectiveValue().toString();
+        }
+        return cellValue;
+    }
+
+    private String convertRowAndColToString(int row, int col) {
+        char newCol = (char) ('A' + col);
+        int newRow = row + 1;
+
+        return String.valueOf(newCol) + newRow;
     }
 
     public static int countDigits(int number) {
@@ -246,42 +270,4 @@ Please enter the option's number you wish to use:""");
         return count;
     }
 
-    public static CellValue convertStringToCellValue(String newValue) {
-
-        CellValue cellValue = null;
-
-        while (true){
-            // Check for Boolean
-            if (newValue.equals("TRUE") || newValue.equals("FALSE")) {
-                cellValue = new BooleanValue(Boolean.parseBoolean(newValue));
-            }
-            // Check for Numerical
-            else if (newValue.matches("-?\\d+(\\.\\d+)?")) {
-                try {
-                    double numericValue = Double.parseDouble(newValue);
-                    cellValue = new NumericValue(numericValue);
-                }
-                catch (NumberFormatException e) {
-                    System.out.println("Invalid numeric value.");
-                }
-            }
-            // Check for Function
-            else if (newValue.matches("\\{[A-Z]+(,[^,]+)*\\}")) {
-                cellValue = new FunctionValue(newValue);
-            }
-            // Otherwise, treat as String
-            else {
-                cellValue = new StringValue(newValue);
-            }
-
-            if (true) {
-                break;
-            }
-            else {
-                System.out.println("Invalid value entered.");
-            }
-        }
-
-        return cellValue;
-    }
 }

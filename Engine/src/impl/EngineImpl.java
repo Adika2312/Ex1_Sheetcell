@@ -2,6 +2,7 @@ package impl;
 
 import api.*;
 import generated.STLSheet;
+import impl.cell.Cell;
 import impl.cell.value.BooleanValue;
 import impl.cell.value.FunctionValue;
 import impl.cell.value.NumericValue;
@@ -47,27 +48,21 @@ public class EngineImpl implements Engine {
     public DTO getSheetDTO() {
         if(currentSheet == null)
             throw new NullPointerException("You must load a file first.");
-        return DTOFactory.createSheetData(currentSheet);
+        return DTOFactory.createSheetDTO(currentSheet);
     }
 
     @Override
-    public DTO getCellDTO(int row, int col) {
+    public DTO getCellDTO(String cellIdentity) {
         if(currentSheet == null)
             throw new NullPointerException("You must load a file first.");
-        return DTOFactory.createCellData(currentSheet.getCell(row, col));
+        Cell currentCell = currentSheet.getCell(cellIdentity);
+        if(currentCell == null)
+            return null;
+        return DTOFactory.createCellDTO(currentSheet.getCell(cellIdentity));
     }
 
     public EngineImpl(DTOFactory DTOFactory) {
         this.DTOFactory = DTOFactory;
-    }
-
-    public DTO getSheetData() {
-        return DTOFactory.createSheetData(this.currentSheet);
-    }
-
-    @Override
-    public String getCellValue(int row, int col) {
-        return currentSheet.getCellValues(row, col);
     }
 
     @Override
@@ -76,45 +71,35 @@ public class EngineImpl implements Engine {
     }
 
     @Override
-    public void updateCellValue(int row, int col, CellValue value, String originalValue) {
-        currentSheet.setCellValues(row, col, value,originalValue);
+    public void updateCellValue(String cellIdentity, CellValue value, String originalValue) {
+        currentSheet.setCellValues(cellIdentity, value, originalValue);
     }
 
 
     public static CellValue convertStringToCellValue(String newValue) {
+        CellValue cellValue;
 
-        CellValue cellValue = null;
-
-        while (true){
-            // Check for Boolean
-            if (newValue.equals("TRUE") || newValue.equals("FALSE")) {
-                cellValue = new BooleanValue(Boolean.parseBoolean(newValue));
+        // Check for Boolean
+        if (newValue.equals("TRUE") || newValue.equals("FALSE")) {
+            cellValue = new BooleanValue(Boolean.parseBoolean(newValue));
+        }
+        // Check for Numerical
+        else if (newValue.matches("-?\\d+(\\.\\d+)?")) {
+            try {
+                double numericValue = Double.parseDouble(newValue);
+                cellValue = new NumericValue(numericValue);
             }
-            // Check for Numerical
-            else if (newValue.matches("-?\\d+(\\.\\d+)?")) {
-                try {
-                    double numericValue = Double.parseDouble(newValue);
-                    cellValue = new NumericValue(numericValue);
-                }
-                catch (NumberFormatException e) {
-                    System.out.println("Invalid numeric value.");
-                }
+            catch (NumberFormatException e) {
+                throw new NumberFormatException("Invalid numeric value.");
             }
-            // Check for Function
-            else if (newValue.matches("\\{[A-Z]+(,[^,]+)*\\}")) {
-                cellValue = new FunctionValue(newValue);
-            }
-            // Otherwise, treat as String
-            else {
-                cellValue = new StringValue(newValue);
-            }
-
-            if (true) {
-                break;
-            }
-            else {
-                System.out.println("Invalid value entered.");
-            }
+        }
+        // Check for Function
+        else if (newValue.matches("\\{[A-Z]+(,[^,]+)*\\}")) {
+            cellValue = new FunctionValue(newValue);
+        }
+        // Otherwise, treat as String
+        else {
+            cellValue = new StringValue(newValue);
         }
 
         return cellValue;

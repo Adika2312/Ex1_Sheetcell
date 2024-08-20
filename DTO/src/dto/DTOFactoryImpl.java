@@ -7,12 +7,12 @@ import impl.sheet.Sheet;
 
 public class DTOFactoryImpl implements DTOFactory {
     @Override
-    public DTO createSheetData(Sheet sheet) {
+    public DTO createSheetDTO(Sheet sheet) {
         return new SheetDTO(sheet);
     }
 
     @Override
-    public DTO createCellData(Cell cell) {
+    public DTO createCellDTO(Cell cell) {
         return new CellDTO(cell);
     }
 }

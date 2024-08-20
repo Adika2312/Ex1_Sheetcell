@@ -4,15 +4,15 @@ import api.DTO;
 import impl.cell.Cell;
 import impl.sheet.Sheet;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 public class SheetDTO implements DTO {
+    private final Map<String, CellDTO> activeCells;
     private final String name;
     private final int version;
     private final int numOfRows;
     private final int numOfCols;
-    private final List<List<Cell>> cellsDTO;
     private final int rowHeight;
     private final int colWidth;
 
@@ -22,14 +22,19 @@ public class SheetDTO implements DTO {
         version = sheet.getVersion();
         numOfRows = sheet.getNumOfRows();
         numOfCols = sheet.getNumOfCols();
-        List<List<Cell>> cellsToCopy = sheet.getCells();
-        cellsDTO = new ArrayList<>();
+        activeCells = createActiveCellDTOMap(sheet);
         rowHeight = sheet.getRowHeight();
         colWidth = sheet.getColWidth();
+    }
 
-        for (List<Cell> innerList : cellsToCopy) {
-            cellsDTO.add(new ArrayList<>(innerList));
+    private Map<String, CellDTO> createActiveCellDTOMap(Sheet sheet) {
+        Map<String, Cell> cellsToCopy = sheet.getActiveCells();
+        Map<String, CellDTO> cellDTOMap = new HashMap<>();
+        for (Cell cell : cellsToCopy.values()) {
+            CellDTO cellDTO = new CellDTO(cell);
+            cellDTOMap.put(cell.getIdentity(), cellDTO);
         }
+        return cellDTOMap;
     }
 
     public String getName() {
@@ -50,10 +55,10 @@ public class SheetDTO implements DTO {
 
     public float getRowHeight() {return rowHeight;}
 
-    public float getColWidth() {return colWidth;}
+    public int getColWidth() {return colWidth;}
 
-    public List<List<Cell>> getCells() {
-        return cellsDTO;
+    public Map<String,CellDTO> getActiveCells() {
+        return activeCells;
     }
 
 }
