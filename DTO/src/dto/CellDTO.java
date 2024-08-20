@@ -12,7 +12,6 @@ public class CellDTO implements DTO {
     private final int version;
     private final CellValue effectiveValue;
     private final String originalValue;
-    private final String Identity;
 //    private final Set<Cell> id2DepedentCell = new HashSet<>();
 //    private final Set<Cell> id2InfluencedCell = new HashSet<>();
 
@@ -21,7 +20,6 @@ public class CellDTO implements DTO {
         version = cell.getVersion();
         effectiveValue = cell.getEffectiveValue();
         originalValue = cell.getOriginalValue();
-        Identity = cell.getIdentity();
     }
 
     public int getVersion() {
@@ -34,9 +32,5 @@ public class CellDTO implements DTO {
 
     public String getOriginalValue() {
         return originalValue;
-    }
-
-    public String getIdentity() {
-        return Identity;
     }
 }

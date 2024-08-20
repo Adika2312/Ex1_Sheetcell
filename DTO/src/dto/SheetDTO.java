@@ -30,10 +30,12 @@ public class SheetDTO implements DTO {
     private Map<String, CellDTO> createActiveCellDTOMap(Sheet sheet) {
         Map<String, Cell> cellsToCopy = sheet.getActiveCells();
         Map<String, CellDTO> cellDTOMap = new HashMap<>();
-        for (Cell cell : cellsToCopy.values()) {
-            CellDTO cellDTO = new CellDTO(cell);
-            cellDTOMap.put(cell.getIdentity(), cellDTO);
+
+        for (Map.Entry<String, Cell> entry : cellsToCopy.entrySet()) {
+            CellDTO cellDTO = new CellDTO(entry.getValue());
+            cellDTOMap.put(entry.getKey(), cellDTO);
         }
+
         return cellDTOMap;
     }
 

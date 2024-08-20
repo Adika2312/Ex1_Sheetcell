@@ -21,9 +21,19 @@ public class EngineImpl implements Engine {
     private final DTOFactory DTOFactory;
     private final String JAXB_XML_PACKAGE_NAME = "generated";
 
+    public EngineImpl(DTOFactory DTOFactory) {
+        this.DTOFactory = DTOFactory;
+    }
+
     @Override
-    public void loadFile(String filePath) throws IOException, JAXBException {
-        STLSheet currentSTLSheet = buildSTLSheetFromXML(filePath);
+    public void loadFile(String filePath) throws IOException {
+        STLSheet currentSTLSheet;
+        try {
+            currentSTLSheet = buildSTLSheetFromXML(filePath);
+        }
+        catch (JAXBException e) {
+            throw new RuntimeException(e);
+        }
         buildSheetFromSTLSheet(currentSTLSheet);
     }
 
@@ -37,11 +47,13 @@ public class EngineImpl implements Engine {
 
     @Override
     public void buildSheetFromSTLSheet(STLSheet currentSTLSheet) {
+        currentSheet = new Sheet();
         currentSheet.setName(currentSTLSheet.getName());
         currentSheet.setNumOfCols(currentSTLSheet.getSTLLayout().getColumns());
         currentSheet.setNumOfRows(currentSTLSheet.getSTLLayout().getRows());
         currentSheet.setColWidth(currentSTLSheet.getSTLLayout().getSTLSize().getColumnWidthUnits());
         currentSheet.setRowHeight(currentSTLSheet.getSTLLayout().getSTLSize().getRowsHeightUnits());
+        currentSheet.setActiveCells(currentSTLSheet.getSTLCells().getSTLCell());
     }
 
     @Override
@@ -61,10 +73,6 @@ public class EngineImpl implements Engine {
         return DTOFactory.createCellDTO(currentSheet.getCell(cellIdentity));
     }
 
-    public EngineImpl(DTOFactory DTOFactory) {
-        this.DTOFactory = DTOFactory;
-    }
-
     @Override
     public boolean isCellInBounds(int row, int col) {
         return(row >= 0 && row < currentSheet.getNumOfRows() && col >= 0 && col < currentSheet.getNumOfCols());
@@ -74,7 +82,6 @@ public class EngineImpl implements Engine {
     public void updateCellValue(String cellIdentity, CellValue value, String originalValue) {
         currentSheet.setCellValues(cellIdentity, value, originalValue);
     }
-
 
     public static CellValue convertStringToCellValue(String newValue) {
         CellValue cellValue;
@@ -103,5 +110,10 @@ public class EngineImpl implements Engine {
         }
 
         return cellValue;
+    }
+
+    @Override
+    public boolean isSheetLoaded(){
+        return currentSheet != null;
     }
 }

@@ -14,5 +14,6 @@ public interface Engine {
     DTO getCellDTO(String cellIdentity);
     STLSheet buildSTLSheetFromXML(String filePath)throws IOException, JAXBException;
     void buildSheetFromSTLSheet(STLSheet currentSTLSheet);
+    boolean isSheetLoaded();
     //List<Version> getDocumentVersions(String documentTitle);
 }

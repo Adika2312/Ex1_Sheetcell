@@ -1,6 +1,9 @@
 package impl.sheet;
 
 import api.CellValue;
+import generated.STLCell;
+import generated.STLCells;
+import impl.EngineImpl;
 import impl.cell.Cell;
 
 import java.util.ArrayList;
@@ -83,4 +86,12 @@ public class Sheet {
         this.rowHeight = rowHeight;
     }
 
+
+    public void setActiveCells(List<STLCell> stlCellsList) {
+        for (STLCell stlCell : stlCellsList) {
+            String cellIdentity = stlCell.getColumn() + stlCell.getRow();
+            String orgValue = stlCell.getSTLOriginalValue();
+            createNewCell(cellIdentity, EngineImpl.convertStringToCellValue(orgValue), orgValue);
+        }
+    }
 }

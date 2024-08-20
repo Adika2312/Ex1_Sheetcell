@@ -9,5 +9,7 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="Engine" />
     <orderEntry type="module" module-name="DTO" />
+    <orderEntry type="library" name="angus-activation" level="project" />
+    <orderEntry type="library" name="jaxb-xjc" level="project" />
   </component>
 </module>

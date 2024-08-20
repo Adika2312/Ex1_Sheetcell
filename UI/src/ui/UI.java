@@ -6,6 +6,7 @@ import dto.CellDTO;
 import dto.DTOFactoryImpl;
 import dto.SheetDTO;
 import impl.*;
+import impl.cell.Cell;
 import utility.CellCoord;
 
 import java.util.InputMismatchException;
@@ -103,7 +104,12 @@ Welcome to the Sheetcell!
     }
 
     private void UpdateCell() {
-        CellCoord cellInput =  getCheckAndPrintBasicCellInfo("update its value:");
+        if(!engine.isSheetLoaded())
+        {
+            System.out.println("You must load a file first.");
+            return;
+        }
+        CellCoord cellInput = getCheckAndPrintBasicCellInfo("update its value:");
         System.out.println("\nPlease enter a new value for the cell:");
         Scanner scanner = new Scanner(System.in);
         String orgValue = scanner.nextLine();
@@ -113,6 +119,11 @@ Welcome to the Sheetcell!
 
 
     private void PrintCell() {
+        if(!engine.isSheetLoaded())
+        {
+            System.out.println("You must load a file first.");
+            return;
+        }
         CellCoord cellInput =  getCheckAndPrintBasicCellInfo("view its value and status:");
         int currVersion = engine.getCellDTO(cellInput.getIdentity()).getVersion();
         System.out.println("Current version: " + currVersion);
@@ -121,7 +132,7 @@ Welcome to the Sheetcell!
     private CellCoord getCheckAndPrintBasicCellInfo(String massage){
         CellCoord cellInput = getAndCheckCellInput(massage);
         try {
-            String cellDataToPrint = convertCellDTOToString((CellDTO) engine.getCellDTO(cellInput.getIdentity()));
+            String cellDataToPrint = convertCellDTOToString(cellInput.getIdentity());
             System.out.println(cellDataToPrint);
         }
         catch (NullPointerException e) {
@@ -130,9 +141,10 @@ Welcome to the Sheetcell!
         return cellInput;
     }
 
-    private String convertCellDTOToString(CellDTO cellDTO) {
+    private String convertCellDTOToString(String cellIdentity) {
         StringBuilder sb = new StringBuilder();
-        sb.append("Cell Identity: ").append(cellDTO.getIdentity());
+        CellDTO cellDTO = (CellDTO) engine.getCellDTO(cellIdentity);
+        sb.append("Cell Identity: ").append(cellIdentity);
         sb.append("Effective Value: ").append(cellDTO.getEffectiveValue()).append("\n");
         sb.append("Original Value: ").append(cellDTO.getOriginalValue());
         return sb.toString();
