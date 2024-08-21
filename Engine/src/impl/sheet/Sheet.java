@@ -40,10 +40,9 @@ public class Sheet {
     }
 
     private void createNewCell(String cellIdentity, CellValue value, String originalValue, boolean isFromFile) {
-        Cell cell = new Cell();
+        Cell cell = new Cell(this);
         activeCells.put(cellIdentity, cell);
         cell.update(value, originalValue, isFromFile);
-
     }
 
     public int getNumOfRows() {

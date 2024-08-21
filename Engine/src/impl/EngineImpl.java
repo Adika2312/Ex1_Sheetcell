@@ -20,7 +20,7 @@ import java.io.*;
 import java.util.List;
 
 public class EngineImpl implements Engine {
-    private Sheet currentSheet;
+    private static Sheet currentSheet;
     private final DTOFactory DTOFactory;
     private final String JAXB_XML_PACKAGE_NAME = "generated";
 

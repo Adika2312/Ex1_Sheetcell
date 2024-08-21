@@ -1,9 +1,11 @@
 package impl.cell.value;
 
 import api.CellValue;
+import impl.cell.Cell;
 
 public class NumericValue implements CellValue {
     private final Double value;
+    private Cell activatingCell;
 
     public NumericValue(double value) {
         this.value = value;
@@ -22,4 +24,11 @@ public class NumericValue implements CellValue {
     public Double eval() {
         return value;
     }
+
+    @Override
+    public void setActivatingCell(Cell cell) {
+        this.activatingCell = cell;
+    }
+
+
 }

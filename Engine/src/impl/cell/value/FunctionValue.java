@@ -3,6 +3,7 @@ package impl.cell.value;
 import api.CellValue;
 import impl.EngineImpl;
 import impl.cell.Cell;
+import impl.sheet.Sheet;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,9 +12,9 @@ import java.util.regex.Pattern;
 
 public class FunctionValue implements CellValue {
     private final FunctionType functionType;
-    List<CellValue> arguments = new ArrayList<>();
-    private final Object effectiveValue;
-
+    private final List<CellValue> arguments = new ArrayList<>();
+    private Object effectiveValue;
+    private Cell activatingCell;
 
     public FunctionValue(String functionDefinition) {
         List<String> argsStr = extractArguments(functionDefinition);
@@ -22,7 +23,14 @@ public class FunctionValue implements CellValue {
             CellValue value = EngineImpl.convertStringToCellValue(argument);
             arguments.add(value);
         }
-        effectiveValue = this.eval();
+    }
+
+    public void calculateAndSetEffectiveValue(){
+        effectiveValue = eval();
+    }
+
+    public void setActivatingCell(Cell cell) {
+        this.activatingCell = cell;
     }
 
     public static List<String> extractArguments(String input) {
@@ -116,6 +124,15 @@ public class FunctionValue implements CellValue {
                 catch (ClassCastException e) {
                     throw new RuntimeException("Error: One or more arguments are not valid. Please check that all arguments are correctly formatted.");
                 }//TODO
+
+            case REF:
+                try {
+                    String str = (String) arguments.getFirst().eval();
+                    return functionType.apply(str, activatingCell);
+                }
+                catch (ClassCastException e) {
+                        throw new RuntimeException("Error: argument is not numeric. Ensure that the input argument is a cell identity.");
+                    }
         }
         return null;
     }
@@ -181,6 +198,13 @@ public class FunctionValue implements CellValue {
                 }
                 return source.substring(startIndex, endIndex + 1);
             }
+        },
+        REF {
+            @Override
+            public CellValue apply(String cellId, Cell activatingCell){
+                Cell referancedCell = activatingCell.getSheet().getCell(cellId);
+                return referancedCell.getEffectiveValue();
+            }
         };
 
         // Overloaded methods to handle different argument types
@@ -199,6 +223,10 @@ public class FunctionValue implements CellValue {
         public double apply(double arg) {
             throw new UnsupportedOperationException("This function does not support numeric operations");
         }
+
+        public CellValue apply(String cellId, Cell activatingCell) {
+            throw new UnsupportedOperationException("This function does not support string REF operations");
+        }
     }
 
     private void checkNumOfArguments(int numOfArgumentsExp, String numArgsStr) throws IllegalArgumentException {
@@ -209,6 +237,10 @@ public class FunctionValue implements CellValue {
 
     @Override
     public Object getEffectiveValue() {
+        if(functionType == FunctionType.REF && effectiveValue instanceof CellValue) {
+            effectiveValue = eval();
+            return ((CellValue) effectiveValue).eval();
+        }
         return effectiveValue;
     }
 

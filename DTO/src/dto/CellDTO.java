@@ -5,25 +5,22 @@ import api.DTO;
 import impl.cell.Cell;
 import impl.cell.value.StringValue;
 
-import java.util.HashSet;
-import java.util.Set;
-
 public class CellDTO implements DTO {
     private final int version;
-    private final CellValue effectiveValue;
+    private final CellValue value;
     private final String originalValue;
 //    private final Set<Cell> id2DepedentCell = new HashSet<>();
 //    private final Set<Cell> id2InfluencedCell = new HashSet<>();
 
     public CellDTO(){
         this.version = 1;
-        this.effectiveValue = new StringValue("");
+        this.value = new StringValue("");
         this.originalValue = "";
     }
 
     public CellDTO(Cell cell) {
         version = cell.getVersion();
-        effectiveValue = cell.getEffectiveValue();
+        value = cell.getEffectiveValue();
         originalValue = cell.getOriginalValue();
     }
 
@@ -31,8 +28,8 @@ public class CellDTO implements DTO {
         return version;
     }
 
-    public CellValue getEffectiveValue() {
-        return effectiveValue;
+    public CellValue getValue() {
+        return value;
     }
 
     public String getOriginalValue() {
