@@ -3,6 +3,7 @@ package impl.cell;
 import api.CellValue;
 import api.Editable;
 import impl.cell.value.FunctionValue;
+import impl.cell.value.StringValue;
 import impl.sheet.Sheet;
 
 import java.util.HashSet;
@@ -11,8 +12,8 @@ import java.util.Set;
 public class Cell implements Editable {
     private final Sheet mySheet;
     private final String identity;
-    private CellValue effectiveValue;
-    private String originalValue;
+    private CellValue effectiveValue = new StringValue("");
+    private String originalValue = "";
     private final Set<Cell> cellsImInfluencing = new HashSet<>();
     private final Set<Cell> cellsImDependentOn = new HashSet<>();
     private int version = 1;
@@ -28,9 +29,9 @@ public class Cell implements Editable {
 
     @Override
     public void update(CellValue value, String originalValue, boolean isFromFile) {
-        this.effectiveValue = value;
         value.setActivatingCell(this);
-        effectiveValue.calculateAndSetEffectiveValue();
+        value.calculateAndSetEffectiveValue();
+        effectiveValue = value;
         this.originalValue = originalValue;
         if(!isFromFile)
             version++;

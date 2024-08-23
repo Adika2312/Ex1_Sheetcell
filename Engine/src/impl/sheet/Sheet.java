@@ -95,6 +95,5 @@ public class Sheet {
     }
 
     public void recalculate(){
-
     }
 }
