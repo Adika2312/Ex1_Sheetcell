@@ -28,10 +28,11 @@ public class Cell implements Editable {
     public void update(CellValue value, String originalValue, boolean isFromFile) {
         this.effectiveValue = value;
         value.setActivatingCell(this);
-        if(value instanceof FunctionValue functionValue)
-        {
-            functionValue.calculateAndSetEffectiveValue();
-        }
+        effectiveValue.calculateAndSetEffectiveValue();
+//        if(value instanceof FunctionValue functionValue)
+//        {
+//            functionValue.calculateAndSetEffectiveValue();
+//        }
         this.originalValue = originalValue;
         if(!isFromFile)
             version++;

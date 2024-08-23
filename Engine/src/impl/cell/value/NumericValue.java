@@ -4,7 +4,7 @@ import api.CellValue;
 import impl.cell.Cell;
 
 public class NumericValue implements CellValue {
-    private final Double value;
+    private Double value;
     private Cell activatingCell;
 
     public NumericValue(double value) {
@@ -30,5 +30,9 @@ public class NumericValue implements CellValue {
         this.activatingCell = cell;
     }
 
+    @Override
+    public void calculateAndSetEffectiveValue(){
+        value = eval();
+    }
 
 }

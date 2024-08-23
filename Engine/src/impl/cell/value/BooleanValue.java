@@ -4,7 +4,7 @@ import api.CellValue;
 import impl.cell.Cell;
 
 public class BooleanValue implements CellValue {
-    private final Boolean value;
+    private Boolean value;
     private Cell activatingCell;
 
     public BooleanValue(boolean value) {
@@ -17,8 +17,8 @@ public class BooleanValue implements CellValue {
     }
 
     @Override
-    public CellValue eval() {
-        return this;
+    public Boolean eval() {
+        return value;
     }
 
     @Override
@@ -26,5 +26,9 @@ public class BooleanValue implements CellValue {
         this.activatingCell = cell;
     }
 
+    @Override
+    public void calculateAndSetEffectiveValue(){
+        value = eval();
+    }
 
 }

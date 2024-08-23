@@ -111,7 +111,7 @@ Welcome to the Sheetcell!
     private void UpdateCell() {
         if(!engine.isSheetLoaded())
         {
-            System.out.println("You must load a file first.");
+            System.out.println("Error: You must load a file to the system before performing this action.");
             return;
         }
         CellCoord cellInput = getCheckAndPrintBasicCellInfo("update its value:");
@@ -126,7 +126,7 @@ Welcome to the Sheetcell!
     private void PrintCell() {
         if(!engine.isSheetLoaded())
         {
-            System.out.println("You must load a file first.");
+            System.out.println("Error: You must load a file to the system before performing this action.");
             return;
         }
         CellCoord cellInput =  getCheckAndPrintBasicCellInfo("view its value and status:");
@@ -207,7 +207,7 @@ Welcome to the Sheetcell!
     private void PrintMenu() {
         System.out.println("""
 
-Please enter the option's number you wish to use:""");
+Please select an option by entering its corresponding number from the menu below:""");
         for (MenuOptions menuOption : MenuOptions.values()){
             System.out.println(menuOption.getValue() + ". " + menuOption.getName());
         }
@@ -266,6 +266,7 @@ Please enter the option's number you wish to use:""");
         }
         return cellValue;
     }
+
 
     private String convertRowAndColToString(int row, int col) {
         char newCol = (char) ('A' + col);

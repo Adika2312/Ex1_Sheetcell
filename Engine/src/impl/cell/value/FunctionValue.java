@@ -92,7 +92,7 @@ public class FunctionValue implements CellValue {
                     return functionType.apply(arg1, arg2);
                 }
                 catch (ClassCastException e) {
-                    throw new RuntimeException("Error: One or more arguments are not numeric. Ensure that all inputs for this function are numbers.");
+                    throw new RuntimeException(String.format("Error: One or more arguments are not valid. Ensure that all inputs for this function are numeric, e.g. {{%s},4,5}.", functionType.name()));
                 }
             case ABS:
                 try {
@@ -101,7 +101,7 @@ public class FunctionValue implements CellValue {
                     return functionType.apply(arg);
                 }
                 catch (ClassCastException e) {
-                    throw new RuntimeException("Error: argument is not numeric. Ensure that all inputs for this function are numbers.");
+                    throw new RuntimeException("Error: argument is not valid. Ensure that the input argument is numeric, e.g. {ABS,3}.");
                 }
             case CONCAT:
                 checkNumOfArguments(2, "2 arguments");
@@ -111,7 +111,7 @@ public class FunctionValue implements CellValue {
                     return functionType.apply(str1, str2);
                 }
                 catch (ClassCastException e) {
-                    throw new RuntimeException("Error: One or more arguments are not valid text. Please check that all arguments are correctly formatted as text.");
+                    throw new RuntimeException("Error: One or more arguments are not valid. Ensure that all arguments are correctly formatted as text, e.g. {CONCAT,HELLO,WORLD}.");
                 }
             case SUB:
                 checkNumOfArguments(3, "3 arguments");
@@ -122,16 +122,16 @@ public class FunctionValue implements CellValue {
                     return functionType.apply(str,idx1,idx2);
                 }
                 catch (ClassCastException e) {
-                    throw new RuntimeException("Error: One or more arguments are not valid. Please check that all arguments are correctly formatted.");
-                }//TODO
+                    throw new RuntimeException("Error: One or more arguments are not valid. Ensure that all arguments are correctly formatted as (source-text, start-index, end-index)  e.g. {SUB,HELLO,1,3}.");
+                }
 
             case REF:
                 try {
                     String str = (String) arguments.getFirst().eval();
-                    return functionType.apply(str, activatingCell);
+                    return functionType.apply(str, activatingCell).eval();
                 }
                 catch (ClassCastException e) {
-                        throw new RuntimeException("Error: argument is not numeric. Ensure that the input argument is a cell identity.");
+                        throw new RuntimeException("Error: argument is not valid. Ensure that the input argument is a cell identity, e.g. {REF,A4}.");
                     }
         }
         return null;
@@ -237,11 +237,20 @@ public class FunctionValue implements CellValue {
 
     @Override
     public Object getEffectiveValue() {
-        if(functionType == FunctionType.REF && effectiveValue instanceof CellValue) {
-            effectiveValue = eval();
-            return ((CellValue) effectiveValue).eval();
+        if(effectiveValue instanceof Double num)
+        {
+            return convertToIntIfWholeNumber(num);
         }
+
         return effectiveValue;
+    }
+
+    public String convertToIntIfWholeNumber(Double value) {
+        if (value % 1 == 0) {
+            return String.format("%,d", value.longValue());
+        } else {
+            return String.format("%,.2f", value);
+        }
     }
 
     public boolean isValid() {
