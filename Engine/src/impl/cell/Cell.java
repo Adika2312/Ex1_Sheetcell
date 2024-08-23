@@ -2,7 +2,6 @@ package impl.cell;
 
 import api.CellValue;
 import api.Editable;
-import impl.cell.value.FunctionValue;
 import impl.cell.value.StringValue;
 import impl.sheet.Sheet;
 
@@ -14,8 +13,8 @@ public class Cell implements Editable {
     private final String identity;
     private CellValue effectiveValue = new StringValue("");
     private String originalValue = "";
-    private final Set<Cell> cellsImInfluencing = new HashSet<>();
-    private final Set<Cell> cellsImDependentOn = new HashSet<>();
+    private Set<Cell> cellsImInfluencing = new HashSet<>();
+    private Set<Cell> cellsImDependentOn = new HashSet<>();
     private int version = 1;
 
     public Cell(Sheet sheet, String identity) {
@@ -23,18 +22,28 @@ public class Cell implements Editable {
         this.identity = identity;
     }
 
+    public Cell(Sheet sheet, Cell cellToCopy) {
+        mySheet = sheet;
+        this.identity = cellToCopy.getIdentity();
+        effectiveValue = cellToCopy.getEffectiveValue();
+        originalValue = cellToCopy.getOriginalValue();
+        cellsImInfluencing = cellToCopy.getCellsImInfluencing();
+        cellsImDependentOn = cellToCopy.getCellsImDependentOn();
+        version = cellToCopy.getVersion();
+    }
+
     public Sheet getSheet() {
         return mySheet;
     }
 
     @Override
-    public void update(CellValue value, String originalValue, boolean isFromFile) {
-        value.setActivatingCell(this);
+    public void update(CellValue value, String originalValue, boolean isFromFile, Sheet alternativeSheet) {
+        value.setActivatingCell(alternativeSheet.getCell(identity));
         value.calculateAndSetEffectiveValue();
-        effectiveValue = value;
-        this.originalValue = originalValue;
+        alternativeSheet.getCell(identity).setEffectiveValue(value);
+        alternativeSheet.getCell(identity).setOriginalValue(originalValue);
         if(!isFromFile)
-            version++;
+            alternativeSheet.getCell(identity).updateVersion();
     }
 
     public int getVersion() {
@@ -60,4 +69,17 @@ public class Cell implements Editable {
     public String getIdentity() {
         return identity;
     }
+
+    public void setEffectiveValue(CellValue value) {
+        effectiveValue = value;
+    }
+
+    public void setOriginalValue(String value) {
+        originalValue = value;
+    }
+
+    public void updateVersion() {
+        version++;
+    }
+
 }

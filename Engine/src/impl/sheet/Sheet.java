@@ -20,6 +20,23 @@ public class Sheet {
     private int rowHeight;
     private int colWidth;
 
+    @Override
+    protected Sheet clone(){
+        Sheet sheet = new Sheet();
+        sheet.name = name;
+        sheet.version = version;
+        sheet.numOfRows = numOfRows;
+        sheet.numOfCols = numOfCols;
+        sheet.rowHeight = rowHeight;
+        sheet.colWidth = colWidth;
+        for (Map.Entry<String, Cell> entry : activeCells.entrySet()) {
+            String copiedKey = entry.getKey();
+            Cell copiedValue = new Cell(sheet, entry.getValue());
+            sheet.activeCells.put(copiedKey, copiedValue);
+        }
+        return sheet;
+    }
+
     public Map<String,Cell> getActiveCells() {
         return activeCells;
     }
@@ -28,21 +45,25 @@ public class Sheet {
         return activeCells.get(cellIdentity);
     }
 
-    public void setCellValues(String cellIdentity, CellValue value, String originalValue, boolean isFromFile) {
+    public Sheet setCellValues(String cellIdentity, CellValue value, String originalValue, boolean isFromFile) {
         Cell cell = getCell(cellIdentity);
+        Sheet alternativeSheet = this.clone();
         if (cell == null){
-            createNewCell(cellIdentity, value, originalValue, isFromFile);
+            createNewCell(cellIdentity, value, originalValue, isFromFile, alternativeSheet);
         }
         else{
-            cell.update(value,originalValue,isFromFile);
+            cell.update(value,originalValue, isFromFile, alternativeSheet);
         }
-        version++;
+        alternativeSheet.recalculate();
+        alternativeSheet.updateVersion();
+        return alternativeSheet;
     }
 
-    private void createNewCell(String cellIdentity, CellValue value, String originalValue, boolean isFromFile) {
+    private void createNewCell(String cellIdentity, CellValue value, String originalValue, boolean isFromFile, Sheet alternativeSheet) {
         Cell cell = new Cell(this, cellIdentity);
-        activeCells.put(cellIdentity, cell);
-        cell.update(value, originalValue, isFromFile);
+        alternativeSheet.getActiveCells().put(cellIdentity, cell);
+        cell.update(value, originalValue, isFromFile, alternativeSheet);
+
     }
 
     public int getNumOfRows() {
@@ -72,6 +93,10 @@ public class Sheet {
         return version;
     }
 
+    public void updateVersion(){
+        version++;
+    }
+
     public int getColWidth() {
         return colWidth;
     }
@@ -90,10 +115,14 @@ public class Sheet {
         for (STLCell stlCell : stlCellsList) {
             String cellIdentity = stlCell.getColumn() + stlCell.getRow();
             String orgValue = stlCell.getSTLOriginalValue();
-            createNewCell(cellIdentity, EngineImpl.convertStringToCellValue(orgValue), orgValue, true);
+            createNewCell(cellIdentity, EngineImpl.convertStringToCellValue(orgValue), orgValue, true, this);
         }
     }
 
     public void recalculate(){
+        for(Cell cell : activeCells.values()){
+            cell.getEffectiveValue().setActivatingCell(cell);
+            cell.getEffectiveValue().calculateAndSetEffectiveValue();
+        }
     }
 }

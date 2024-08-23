@@ -131,7 +131,7 @@ public class EngineImpl implements Engine {
 
     @Override
     public void updateCellValue(String cellIdentity, CellValue value, String originalValue) {
-        currentSheet.setCellValues(cellIdentity, value, originalValue, false);
+        currentSheet = currentSheet.setCellValues(cellIdentity, value, originalValue, false);
     }
 
     public static CellValue convertStringToCellValue(String newValue) {
