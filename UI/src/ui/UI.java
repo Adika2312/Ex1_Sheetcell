@@ -13,6 +13,7 @@ import java.io.FileNotFoundException;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class UI {
     Engine engine = new EngineImpl(new DTOFactoryImpl());
@@ -130,8 +131,13 @@ Welcome to the Sheetcell!
             return;
         }
         CellCoord cellInput =  getCheckAndPrintBasicCellInfo("view its value and status:");
-        int currVersion = engine.getCellDTO(cellInput.getIdentity()).getVersion();
+        CellDTO currCellDTO = (CellDTO) engine.getCellDTO(cellInput.getIdentity());
+        int currVersion = currCellDTO.getVersion();
         System.out.println("Current version: " + currVersion);
+        String lst1 = String.join(", ", currCellDTO.getCellsImDependentOn());
+        System.out.println("Cells Dependency List: " + lst1);
+        String lst2 = String.join(", ", currCellDTO.getCellsImInfluencing());
+        System.out.println("Cells Influence List: " + lst2);
     }
 
     private CellCoord getCheckAndPrintBasicCellInfo(String massage){

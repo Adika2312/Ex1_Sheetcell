@@ -9,15 +9,17 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class Cell implements Editable {
-    private Sheet mySheet;
+    private final Sheet mySheet;
+    private final String identity;
     private CellValue effectiveValue;
     private String originalValue;
     private final Set<Cell> cellsImInfluencing = new HashSet<>();
     private final Set<Cell> cellsImDependentOn = new HashSet<>();
     private int version = 1;
 
-    public Cell(Sheet sheet) {
+    public Cell(Sheet sheet, String identity) {
         mySheet = sheet;
+        this.identity = identity;
     }
 
     public Sheet getSheet() {
@@ -29,23 +31,10 @@ public class Cell implements Editable {
         this.effectiveValue = value;
         value.setActivatingCell(this);
         effectiveValue.calculateAndSetEffectiveValue();
-//        if(value instanceof FunctionValue functionValue)
-//        {
-//            functionValue.calculateAndSetEffectiveValue();
-//        }
         this.originalValue = originalValue;
         if(!isFromFile)
             version++;
     }
-
-//    @Override
-//    public String toString() {
-//        StringBuilder str = new StringBuilder();
-//        str.append("Effective Value: ").append(effectiveValue.getEffectiveValue()).append("\n");
-//        str.append("Original Value: ").append(originalValue);
-//
-//        return str.toString();
-//    }
 
     public int getVersion() {
         return version;
@@ -65,5 +54,9 @@ public class Cell implements Editable {
 
     public Set<Cell> getCellsImDependentOn() {
         return cellsImDependentOn;
+    }
+
+    public String getIdentity() {
+        return identity;
     }
 }

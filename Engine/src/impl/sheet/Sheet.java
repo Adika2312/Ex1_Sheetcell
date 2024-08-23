@@ -40,7 +40,7 @@ public class Sheet {
     }
 
     private void createNewCell(String cellIdentity, CellValue value, String originalValue, boolean isFromFile) {
-        Cell cell = new Cell(this);
+        Cell cell = new Cell(this, cellIdentity);
         activeCells.put(cellIdentity, cell);
         cell.update(value, originalValue, isFromFile);
     }
@@ -92,5 +92,9 @@ public class Sheet {
             String orgValue = stlCell.getSTLOriginalValue();
             createNewCell(cellIdentity, EngineImpl.convertStringToCellValue(orgValue), orgValue, true);
         }
+    }
+
+    public void recalculate(){
+
     }
 }

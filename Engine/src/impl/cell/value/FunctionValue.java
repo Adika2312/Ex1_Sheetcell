@@ -1,6 +1,7 @@
 package impl.cell.value;
 
 import api.CellValue;
+import exception.WrongParenthesesOrderException;
 import impl.EngineImpl;
 import impl.cell.Cell;
 import impl.sheet.Sheet;
@@ -21,6 +22,7 @@ public class FunctionValue implements CellValue {
         functionType = parseFunctionType(argsStr.getFirst());
         for (String argument : argsStr.subList(1, argsStr.size())) {
             CellValue value = EngineImpl.convertStringToCellValue(argument);
+            value.setActivatingCell(activatingCell);
             arguments.add(value);
         }
     }
@@ -31,6 +33,9 @@ public class FunctionValue implements CellValue {
 
     public void setActivatingCell(Cell cell) {
         this.activatingCell = cell;
+        for (CellValue argument : arguments) {
+            argument.setActivatingCell(activatingCell);
+        }
     }
 
     public static List<String> extractArguments(String input) {
@@ -39,7 +44,7 @@ public class FunctionValue implements CellValue {
         int start = 0;
         boolean insideArgument = false;
 
-        for (int i = 0; i < input.length(); i++) {
+        for (int i = 0; i < input.length() && level >= 0; i++) {
             char c = input.charAt(i);
 
             if (c == '{') {
@@ -47,7 +52,8 @@ public class FunctionValue implements CellValue {
                     start = i;
                 }
                 level++;
-            } else if (c == '}') {
+            }
+            else if (c == '}') {
                 level--;
                 if (level == 0) {
                     arguments.add(input.substring(start, i).trim());
@@ -56,7 +62,8 @@ public class FunctionValue implements CellValue {
                 else{
                     insideArgument = true;
                 }
-            } else if (c == ',' && level == 1) {
+            }
+            else if (c == ',' && level == 1) {
                 if (insideArgument) {
                     arguments.add(input.substring(start, i).trim());
                 }
@@ -68,9 +75,13 @@ public class FunctionValue implements CellValue {
             }
         }
 
-        // Add the last argument if there is one
         if (insideArgument) {
             arguments.add(input.substring(start).trim());
+        }
+
+        if(level != 0)
+        {
+            throw new WrongParenthesesOrderException();
         }
 
         return arguments;
@@ -203,6 +214,12 @@ public class FunctionValue implements CellValue {
             @Override
             public CellValue apply(String cellId, Cell activatingCell){
                 Cell referancedCell = activatingCell.getSheet().getCell(cellId);
+                if(referancedCell == null)
+                {
+                    throw new NullPointerException("Error: Cell " + cellId + " contains no value and cannot be referred.");
+                }
+                activatingCell.getCellsImDependentOn().add(referancedCell);
+                referancedCell.getCellsImInfluencing().add(activatingCell);
                 return referancedCell.getEffectiveValue();
             }
         };
