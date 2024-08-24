@@ -20,6 +20,23 @@ public class Sheet {
     private int rowHeight;
     private int colWidth;
 
+    @Override
+    protected Sheet clone(){
+        Sheet sheet = new Sheet();
+        sheet.name = name;
+        sheet.version = version;
+        sheet.numOfRows = numOfRows;
+        sheet.numOfCols = numOfCols;
+        sheet.rowHeight = rowHeight;
+        sheet.colWidth = colWidth;
+        for (Map.Entry<String, Cell> entry : activeCells.entrySet()) {
+            String copiedKey = entry.getKey();
+            Cell copiedValue = new Cell(sheet, entry.getValue());
+            sheet.activeCells.put(copiedKey, copiedValue);
+        }
+        return sheet;
+    }
+
     public Map<String,Cell> getActiveCells() {
         return activeCells;
     }
