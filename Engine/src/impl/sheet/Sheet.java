@@ -106,6 +106,8 @@ public class Sheet {
             String orgValue = stlCell.getSTLOriginalValue();
             createNewCell(cellIdentity, EngineImpl.convertStringToCellValue(orgValue), orgValue, true);
         }
+        List<Cell> topologicalOrder = sortActiveCellsTopologicallyByDFS();
+        recalculateByTopologicalOrder(topologicalOrder);
     }
 
     public void detectCycleByDFS(){

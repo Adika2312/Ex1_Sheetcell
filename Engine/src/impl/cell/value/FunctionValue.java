@@ -103,7 +103,7 @@ public class FunctionValue implements CellValue {
                     return functionType.apply(arg1, arg2);
                 }
                 catch (ClassCastException e) {
-                    throw new RuntimeException(String.format("Error: One or more arguments are not valid. Ensure that all inputs for this function are numeric, e.g. {{%s},4,5}.", functionType.name()));
+                    throw new RuntimeException(String.format("Error: One or more arguments are not valid. Ensure that all inputs for this function are numeric, e.g. {%s,4,5}.", functionType.name()));
                 }
             case ABS:
                 try {
@@ -213,7 +213,7 @@ public class FunctionValue implements CellValue {
         REF {
             @Override
             public CellValue apply(String cellId, Cell activatingCell){
-                Cell referancedCell = activatingCell.getSheet().getCell(cellId);
+                Cell referancedCell = activatingCell.getSheet().getCell(cellId.toUpperCase());
                 if(referancedCell == null)
                 {
                     throw new NullPointerException("Error: Cell " + cellId + " contains no value and cannot be referred.");

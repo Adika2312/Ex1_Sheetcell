@@ -34,7 +34,6 @@ public class EngineImpl implements Engine {
         checkIfFilePathValid(filePath);
         STLSheet currentSTLSheet = buildSTLSheetFromXML(filePath);
         buildSheetFromSTLSheet(currentSTLSheet);
-
     }
 
     private void checkIfFilePathValid(String filePath) throws FileNotFoundException, FileNotXMLException {

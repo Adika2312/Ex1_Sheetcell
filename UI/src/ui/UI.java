@@ -11,6 +11,7 @@ import utility.CellCoord;
 
 import java.io.FileNotFoundException;
 import java.util.InputMismatchException;
+import java.util.Locale;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 
@@ -170,7 +171,7 @@ Welcome to the Sheetcell!
 
         while(true){
             System.out.println("Please enter the cell identity (e.g., A4) to " + massage);
-            cellIdentity = scanner.nextLine().trim();
+            cellIdentity = scanner.nextLine().trim().toUpperCase();
 
             if (cellPattern.matcher(cellIdentity).matches()) {
                 String columnString = cellIdentity.replaceAll("[0-9]", "");

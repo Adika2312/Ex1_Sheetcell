@@ -22,15 +22,14 @@ public class Cell implements Editable {
         this.identity = identity;
     }
 
-
     public Cell(Sheet sheet, Cell cellToCopy) {
         mySheet = sheet;
         this.identity = cellToCopy.getIdentity();
         effectiveValue = cellToCopy.getEffectiveValue();
         effectiveValue.setActivatingCell(this);
         originalValue = cellToCopy.getOriginalValue();
-        cellsImInfluencing = cellToCopy.getCellsImInfluencing();
-        cellsImDependentOn = cellToCopy.getCellsImDependentOn();
+        cellsImInfluencing = new HashSet<>(cellToCopy.getCellsImInfluencing());
+        cellsImDependentOn = new HashSet<>(cellToCopy.getCellsImDependentOn());
         version = cellToCopy.getVersion();
     }
 
