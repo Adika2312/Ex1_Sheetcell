@@ -13,7 +13,6 @@ import java.io.FileNotFoundException;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 public class UI {
     Engine engine = new EngineImpl(new DTOFactoryImpl());
@@ -60,7 +59,7 @@ Welcome to the Sheetcell!
                         loadFile();
                         break;
                     case DISPLAY_SHEET:
-                        PrintSheet();
+                        printSheet();
                         break;
                     case DISPLAY_CELL:
                         PrintCell();
@@ -121,6 +120,7 @@ Welcome to the Sheetcell!
         String orgValue = scanner.nextLine();
         CellValue newCellValue = EngineImpl.convertStringToCellValue(orgValue);
         engine.updateCellValue(cellInput.getIdentity(), newCellValue, orgValue);
+        printSheet();
     }
 
 
@@ -219,7 +219,7 @@ Please select an option by entering its corresponding number from the menu below
         }
     }
 
-    private void PrintSheet() {
+    private void printSheet() {
         try {
             String SheetDataToPrint = convertSheetDTOToString((SheetDTO) engine.getSheetDTO());
             System.out.println(SheetDataToPrint);

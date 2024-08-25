@@ -220,6 +220,13 @@ public class FunctionValue implements CellValue {
                 }
                 activatingCell.getCellsImDependentOn().add(referancedCell);
                 referancedCell.getCellsImInfluencing().add(activatingCell);
+                try {
+                    activatingCell.getSheet().detectCycleByDFS();
+                }
+                catch (IllegalStateException e)
+                {
+                    throw new IllegalStateException(e.getMessage() + String.format(" %s cannot refer to %s.", activatingCell.getIdentity(), cellId));
+                }
                 return referancedCell.getEffectiveValue();
             }
         };

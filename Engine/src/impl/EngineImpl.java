@@ -17,7 +17,6 @@ import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Unmarshaller;
 
 import java.io.*;
-import java.util.ArrayList;
 import java.util.List;
 
 public class EngineImpl implements Engine {
@@ -132,8 +131,13 @@ public class EngineImpl implements Engine {
     @Override
     public void updateCellValue(String cellIdentity, CellValue value, String originalValue) {
         Sheet alternativeSheet = currentSheet.clone();
-        List topologicalOrder = currentSheet.getTopologicalOrderFromActiveCells();
-        alternativeSheet.setCellValues(cellIdentity, value, originalValue, false);
+        List<Cell> topologicalOrder = alternativeSheet.sortActiveCellsTopologicallyByDFS();
+        alternativeSheet.updateOrCreateCell(cellIdentity, value, originalValue, false);
+
+        if(!topologicalOrder.contains(alternativeSheet.getCell(cellIdentity)))
+            topologicalOrder.addLast(alternativeSheet.getCell(cellIdentity));
+
+        alternativeSheet.recalculateByTopologicalOrder(topologicalOrder);
         currentSheet = alternativeSheet;
     }
 

@@ -2,7 +2,6 @@ package impl.sheet;
 
 import api.CellValue;
 import generated.STLCell;
-import generated.STLCells;
 import impl.EngineImpl;
 import impl.cell.Cell;
 
@@ -42,13 +41,14 @@ public class Sheet {
         return activeCells.get(cellIdentity);
     }
 
-    public void setCellValues(String cellIdentity, CellValue value, String originalValue, boolean isFromFile) {
+    public void updateOrCreateCell(String cellIdentity, CellValue value, String originalValue, boolean isFromFile) {
         Cell cell = getCell(cellIdentity);
+        //If cell is not in active cells
         if (cell == null){
             createNewCell(cellIdentity, value, originalValue, isFromFile);
         }
         else{
-            cell.update(value,originalValue,isFromFile);
+            cell.updateValues(value,originalValue,isFromFile);
         }
         version++;
     }
@@ -56,7 +56,7 @@ public class Sheet {
     private void createNewCell(String cellIdentity, CellValue value, String originalValue, boolean isFromFile) {
         Cell cell = new Cell(this, cellIdentity);
         activeCells.put(cellIdentity, cell);
-        cell.update(value, originalValue, isFromFile);
+        cell.updateValues(value, originalValue, isFromFile);
     }
 
     public int getNumOfRows() {
@@ -108,10 +108,11 @@ public class Sheet {
         }
     }
 
-    public void recalculate(){
+    public void detectCycleByDFS(){
+        sortActiveCellsTopologicallyByDFS();
     }
 
-    public List getTopologicalOrderFromActiveCells() {
+    public List<Cell> sortActiveCellsTopologicallyByDFS() {
         List<Cell> topologicalOrder = new ArrayList<>();
         Set<String> visited = new HashSet<>();
         Set<String> inStack = new HashSet<>();
@@ -120,13 +121,15 @@ public class Sheet {
         for (String cellId : activeCells.keySet()) {
             if (!visited.contains(cellId)) {
                 if (!iterativeDFS(activeCells.get(cellId), visited, inStack, stack, topologicalOrder)) {
-                    throw new IllegalStateException("Cycle detected! Topological sorting is not possible.");
+                    throw new IllegalStateException("Error: Circular reference loop detected in spreadsheet.");
                 }
             }
         }
 
         return topologicalOrder;
     }
+
+
 
     private boolean iterativeDFS(Cell startNode, Set<String> visited, Set<String> inStack, Stack<Cell> stack, List<Cell> topologicalOrder) {
         stack.push(startNode);
@@ -162,5 +165,15 @@ public class Sheet {
         }
 
         return true;
+    }
+
+    public void recalculateByTopologicalOrder(List<Cell> topologicalOrder) {
+
+        for (Cell cell : topologicalOrder) {
+            cell.clearDependenciesLists();
+            cell.calculateEffectiveValue();
+        }
+
+        //detectCycleByDFS();
     }
 }

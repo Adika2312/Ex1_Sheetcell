@@ -2,7 +2,6 @@ package impl.cell;
 
 import api.CellValue;
 import api.Editable;
-import impl.cell.value.FunctionValue;
 import impl.cell.value.StringValue;
 import impl.sheet.Sheet;
 
@@ -28,6 +27,7 @@ public class Cell implements Editable {
         mySheet = sheet;
         this.identity = cellToCopy.getIdentity();
         effectiveValue = cellToCopy.getEffectiveValue();
+        effectiveValue.setActivatingCell(this);
         originalValue = cellToCopy.getOriginalValue();
         cellsImInfluencing = cellToCopy.getCellsImInfluencing();
         cellsImDependentOn = cellToCopy.getCellsImDependentOn();
@@ -40,10 +40,10 @@ public class Cell implements Editable {
     }
 
     @Override
-    public void update(CellValue value, String originalValue, boolean isFromFile) {
-        value.setActivatingCell(this);
-        value.calculateAndSetEffectiveValue();
-        effectiveValue = value;
+    public void updateValues(CellValue effectiveValue, String originalValue, boolean isFromFile) {
+        effectiveValue.setActivatingCell(this);
+        //effectiveValue.calculateAndSetEffectiveValue();
+        this.effectiveValue = effectiveValue;
         this.originalValue = originalValue;
         if(!isFromFile)
             version++;
@@ -55,6 +55,10 @@ public class Cell implements Editable {
 
     public CellValue getEffectiveValue() {
         return effectiveValue;
+    }
+
+    public void calculateEffectiveValue() {
+        effectiveValue.calculateAndSetEffectiveValue();
     }
 
     public String getOriginalValue() {
@@ -71,5 +75,10 @@ public class Cell implements Editable {
 
     public String getIdentity() {
         return identity;
+    }
+
+    public void clearDependenciesLists() {
+        cellsImInfluencing.clear();
+        cellsImDependentOn.clear();
     }
 }
