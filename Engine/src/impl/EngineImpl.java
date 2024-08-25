@@ -17,6 +17,7 @@ import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Unmarshaller;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public class EngineImpl implements Engine {
@@ -60,7 +61,6 @@ public class EngineImpl implements Engine {
     public void buildSheetFromSTLSheet(STLSheet currentSTLSheet) {
         checkDataValidity(currentSTLSheet);
         currentSheet = new Sheet();
-
         currentSheet.setName(currentSTLSheet.getName());
         currentSheet.setNumOfCols(currentSTLSheet.getSTLLayout().getColumns());
         currentSheet.setNumOfRows(currentSTLSheet.getSTLLayout().getRows());
@@ -131,7 +131,10 @@ public class EngineImpl implements Engine {
 
     @Override
     public void updateCellValue(String cellIdentity, CellValue value, String originalValue) {
-        currentSheet.setCellValues(cellIdentity, value, originalValue, false);
+        Sheet alternativeSheet = currentSheet.clone();
+        List topologicalOrder = currentSheet.getTopologicalOrderFromActiveCells();
+        alternativeSheet.setCellValues(cellIdentity, value, originalValue, false);
+        currentSheet = alternativeSheet;
     }
 
     public static CellValue convertStringToCellValue(String newValue) {

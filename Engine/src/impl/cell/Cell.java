@@ -14,14 +14,26 @@ public class Cell implements Editable {
     private final String identity;
     private CellValue effectiveValue = new StringValue("");
     private String originalValue = "";
-    private final Set<Cell> cellsImInfluencing = new HashSet<>();
-    private final Set<Cell> cellsImDependentOn = new HashSet<>();
+    private Set<Cell> cellsImInfluencing = new HashSet<>();
+    private Set<Cell> cellsImDependentOn = new HashSet<>();
     private int version = 1;
 
     public Cell(Sheet sheet, String identity) {
         mySheet = sheet;
         this.identity = identity;
     }
+
+
+    public Cell(Sheet sheet, Cell cellToCopy) {
+        mySheet = sheet;
+        this.identity = cellToCopy.getIdentity();
+        effectiveValue = cellToCopy.getEffectiveValue();
+        originalValue = cellToCopy.getOriginalValue();
+        cellsImInfluencing = cellToCopy.getCellsImInfluencing();
+        cellsImDependentOn = cellToCopy.getCellsImDependentOn();
+        version = cellToCopy.getVersion();
+    }
+
 
     public Sheet getSheet() {
         return mySheet;

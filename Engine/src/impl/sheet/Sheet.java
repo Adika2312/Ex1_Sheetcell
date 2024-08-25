@@ -6,10 +6,7 @@ import generated.STLCells;
 import impl.EngineImpl;
 import impl.cell.Cell;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Sheet {
     private String name;
@@ -21,7 +18,7 @@ public class Sheet {
     private int colWidth;
 
     @Override
-    protected Sheet clone(){
+    public Sheet clone(){
         Sheet sheet = new Sheet();
         sheet.name = name;
         sheet.version = version;
@@ -112,5 +109,58 @@ public class Sheet {
     }
 
     public void recalculate(){
+    }
+
+    public List getTopologicalOrderFromActiveCells() {
+        List<Cell> topologicalOrder = new ArrayList<>();
+        Set<String> visited = new HashSet<>();
+        Set<String> inStack = new HashSet<>();
+        Stack<Cell> stack = new Stack<>();
+
+        for (String cellId : activeCells.keySet()) {
+            if (!visited.contains(cellId)) {
+                if (!iterativeDFS(activeCells.get(cellId), visited, inStack, stack, topologicalOrder)) {
+                    throw new IllegalStateException("Cycle detected! Topological sorting is not possible.");
+                }
+            }
+        }
+
+        return topologicalOrder;
+    }
+
+    private boolean iterativeDFS(Cell startNode, Set<String> visited, Set<String> inStack, Stack<Cell> stack, List<Cell> topologicalOrder) {
+        stack.push(startNode);
+
+        while (!stack.isEmpty()) {
+            Cell currentNode = stack.peek();
+
+            if (!visited.contains(currentNode.getIdentity())) {
+                visited.add(currentNode.getIdentity());
+                inStack.add(currentNode.getIdentity());
+            }
+
+            boolean hasUnvisitedDependency = false;
+            Cell currentCell = activeCells.get(currentNode.getIdentity());
+            if (currentCell != null) {
+                for (Cell dependency : currentCell.getCellsImDependentOn()) {
+                    if (inStack.contains(dependency.getIdentity())) {
+                        return false; //cycle
+                    }
+
+                    if (!visited.contains(dependency.getIdentity())) {
+                        stack.push(dependency);
+                        hasUnvisitedDependency = true;
+                    }
+                }
+            }
+
+            if (!hasUnvisitedDependency) {
+                inStack.remove(currentNode.getIdentity());
+                stack.pop();
+                topologicalOrder.add(currentNode);
+            }
+        }
+
+        return true;
     }
 }
