@@ -1,6 +1,7 @@
 package ui;
 
 import api.CellValue;
+import api.DTO;
 import api.Engine;
 import dto.CellDTO;
 import dto.DTOFactoryImpl;
@@ -12,6 +13,7 @@ import utility.CellCoord;
 import java.io.FileNotFoundException;
 import java.util.InputMismatchException;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 
@@ -69,7 +71,7 @@ Welcome to the Sheetcell!
                         UpdateCell();
                         break;
                     case DISPLAY_VERSIONS:
-                        System.out.println("Displaying versions...");
+                        displayPreviousVersions();
                         break;
                     case EXIT:
                         isProgramRunning = false;
@@ -91,6 +93,24 @@ Welcome to the Sheetcell!
             System.out.println(e.getMessage());
             scanner.nextLine();
         }
+    }
+
+    private void displayPreviousVersions() {
+
+        Map<Integer, DTO> sheetsPreviousVersionsDTO = engine.getSheetsPreviousVersionsDTO();
+        StringBuilder sb = new StringBuilder();
+        sb.append("""
+                Version    Changed Cells Count
+                *******    *******************
+                """);
+
+        for(Map.Entry<Integer, DTO> entry : sheetsPreviousVersionsDTO.entrySet()) {
+            int version = entry.getKey();
+            SheetDTO currSheet = (SheetDTO)entry.getValue();
+            sb.append(String.format("%-10d %-19d%n", version, currSheet.getChangedCellsCount()));
+        }
+
+        System.out.println(sb);
     }
 
     private void loadFile() {

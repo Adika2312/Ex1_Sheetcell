@@ -15,7 +15,11 @@ public class SheetDTO implements DTO {
     private final int numOfCols;
     private final int rowHeight;
     private final int colWidth;
+    private int changedCellsCount = 0;
 
+    public int getChangedCellsCount() {
+        return changedCellsCount;
+    }
 
     public SheetDTO(Sheet sheet) {
         name = sheet.getName();
@@ -25,6 +29,7 @@ public class SheetDTO implements DTO {
         activeCells = createActiveCellDTOMap(sheet);
         rowHeight = sheet.getRowHeight();
         colWidth = sheet.getColWidth();
+        changedCellsCount = sheet.getChangedCellsCount();
     }
 
     private Map<String, CellDTO> createActiveCellDTOMap(Sheet sheet) {

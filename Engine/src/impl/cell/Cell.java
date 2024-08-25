@@ -60,6 +60,7 @@ public class Cell implements Editable {
         effectiveValue.calculateAndSetEffectiveValue();
     }
 
+
     public String getOriginalValue() {
         return originalValue;
     }

@@ -17,7 +17,10 @@ import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Unmarshaller;
 
 import java.io.*;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 public class EngineImpl implements Engine {
     private static Sheet currentSheet;
@@ -34,6 +37,7 @@ public class EngineImpl implements Engine {
         checkIfFilePathValid(filePath);
         STLSheet currentSTLSheet = buildSTLSheetFromXML(filePath);
         buildSheetFromSTLSheet(currentSTLSheet);
+        Sheet.clearPreviousVersions();
     }
 
     private void checkIfFilePathValid(String filePath) throws FileNotFoundException, FileNotXMLException {
@@ -132,11 +136,14 @@ public class EngineImpl implements Engine {
         Sheet alternativeSheet = currentSheet.clone();
         List<Cell> topologicalOrder = alternativeSheet.sortActiveCellsTopologicallyByDFS();
         alternativeSheet.updateOrCreateCell(cellIdentity, value, originalValue, false);
+        Cell updatedCell = alternativeSheet.getCell(cellIdentity);
 
-        if(!topologicalOrder.contains(alternativeSheet.getCell(cellIdentity)))
-            topologicalOrder.addLast(alternativeSheet.getCell(cellIdentity));
+        if(!topologicalOrder.contains(updatedCell))
+            topologicalOrder.addLast(updatedCell);
 
         alternativeSheet.recalculateByTopologicalOrder(topologicalOrder);
+        alternativeSheet.calculateChangedCells(updatedCell);
+        Sheet.addToPreviousVersions(currentSheet);
         currentSheet = alternativeSheet;
     }
 
@@ -172,5 +179,17 @@ public class EngineImpl implements Engine {
     @Override
     public boolean isSheetLoaded(){
         return currentSheet != null;
+    }
+
+    @Override
+    public Map<Integer, DTO> getSheetsPreviousVersionsDTO() {
+        Map<Integer,Sheet> previousVersions = currentSheet.getPreviousVersions();
+        Map<Integer, DTO> previousVersionsDTO = new TreeMap<>();
+
+        for(Map.Entry<Integer,Sheet> entry : previousVersions.entrySet()) {
+            previousVersionsDTO.put(entry.getKey(), DTOFactory.createSheetDTO(entry.getValue()));
+        }
+
+        return previousVersionsDTO;
     }
 }

@@ -15,6 +15,9 @@ public class Sheet {
     private int numOfCols;
     private int rowHeight;
     private int colWidth;
+    private int changedCellsCount = 0;
+    private final static Map<Integer,Sheet> previousVersions = new HashMap<>();
+
 
     @Override
     public Sheet clone(){
@@ -31,6 +34,14 @@ public class Sheet {
             sheet.activeCells.put(copiedKey, copiedValue);
         }
         return sheet;
+    }
+
+    public int getChangedCellsCount() {
+        return changedCellsCount;
+    }
+
+    public Map<Integer,Sheet> getPreviousVersions() {
+        return previousVersions;
     }
 
     public Map<String,Cell> getActiveCells() {
@@ -58,6 +69,8 @@ public class Sheet {
         activeCells.put(cellIdentity, cell);
         cell.updateValues(value, originalValue, isFromFile);
     }
+
+
 
     public int getNumOfRows() {
         return numOfRows;
@@ -175,7 +188,31 @@ public class Sheet {
             cell.clearDependenciesLists();
             cell.calculateEffectiveValue();
         }
+    }
 
-        //detectCycleByDFS();
+    public static void addToPreviousVersions(Sheet sheet) {
+        previousVersions.put(sheet.getVersion(),sheet);
+    }
+
+    public static void clearPreviousVersions() {
+        previousVersions.clear();
+    }
+
+    public void calculateChangedCells(Cell updatedCell) {
+
+        calculateCellsImInfluencing(updatedCell);
+        changedCellsCount++;
+    }
+
+    public void calculateCellsImInfluencing(Cell updatedCell){
+
+        if(updatedCell.getCellsImInfluencing().isEmpty()){
+            return;
+        }
+
+        for(Cell cell : updatedCell.getCellsImInfluencing()) {
+            changedCellsCount++;
+            calculateChangedCells(cell);
+        }
     }
 }
