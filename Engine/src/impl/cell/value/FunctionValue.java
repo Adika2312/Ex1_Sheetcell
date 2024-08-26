@@ -28,7 +28,12 @@ public class FunctionValue implements CellValue {
     }
 
     public void calculateAndSetEffectiveValue(){
-        effectiveValue = eval();
+        try{
+            effectiveValue = eval();
+        }
+        catch(ArithmeticException e){
+            effectiveValue = "NaN";
+        }
     }
 
     public void setActivatingCell(Cell cell) {
@@ -56,7 +61,7 @@ public class FunctionValue implements CellValue {
             else if (c == '}') {
                 level--;
                 if (level == 0) {
-                    arguments.add(input.substring(start, i).trim());
+                    arguments.add(input.substring(start, i));
                     insideArgument = false;
                 }
                 else{
@@ -65,18 +70,18 @@ public class FunctionValue implements CellValue {
             }
             else if (c == ',' && level == 1) {
                 if (insideArgument) {
-                    arguments.add(input.substring(start, i).trim());
+                    arguments.add(input.substring(start, i));
                 }
                 start = i + 1;
                 insideArgument = false;
-            } else if (level == 1 && !insideArgument && c != ' ') {
+            } else if (level == 1 && !insideArgument) {
                 start = i;
                 insideArgument = true;
             }
         }
 
         if (insideArgument) {
-            arguments.add(input.substring(start).trim());
+            arguments.add(input.substring(start));
         }
 
         if(level != 0)
@@ -186,6 +191,9 @@ public class FunctionValue implements CellValue {
         POW {
             @Override
             public double apply(double arg1, double arg2) {
+                if(arg1 == 0 && arg2 < 0){
+                    throw new ArithmeticException("Division by zero");
+                }
                 return Math.pow(arg1, arg2);
             }
         },
@@ -277,10 +285,6 @@ public class FunctionValue implements CellValue {
         }
     }
 
-    public boolean isValid() {
-        return functionType != null;
-    }
-
     private FunctionType parseFunctionType(String functionName) {
         try {
             return FunctionType.valueOf(functionName);
@@ -290,9 +294,8 @@ public class FunctionValue implements CellValue {
         }
     }
 
-
-
-
-
-
+    @Override
+    public Cell getActivatingCell() {
+        return activatingCell;
+    }
 }

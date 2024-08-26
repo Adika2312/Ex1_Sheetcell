@@ -31,4 +31,9 @@ public class BooleanValue implements CellValue {
         value = eval();
     }
 
+    @Override
+    public Cell getActivatingCell() {
+        return activatingCell;
+    }
+
 }

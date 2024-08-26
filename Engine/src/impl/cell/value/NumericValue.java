@@ -35,4 +35,9 @@ public class NumericValue implements CellValue {
         value = eval();
     }
 
+    @Override
+    public Cell getActivatingCell() {
+        return activatingCell;
+    }
+
 }

@@ -8,7 +8,7 @@ public class StringValue implements CellValue {
     private Cell activatingCell;
 
     public StringValue(String value) {
-        this.value = value.trim();
+        this.value = value;
     }
 
     @Override
@@ -32,4 +32,8 @@ public class StringValue implements CellValue {
         value = eval();
     }
 
+    @Override
+    public Cell getActivatingCell() {
+        return activatingCell;
+    }
 }

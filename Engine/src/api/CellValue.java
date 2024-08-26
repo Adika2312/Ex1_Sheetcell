@@ -7,5 +7,6 @@ public interface CellValue {
     Object eval();
     void setActivatingCell(Cell cell);
     void calculateAndSetEffectiveValue();
+    Cell getActivatingCell();
 }
 
