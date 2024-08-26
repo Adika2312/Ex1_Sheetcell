@@ -118,6 +118,7 @@ public class Sheet {
             String cellIdentity = stlCell.getColumn() + stlCell.getRow();
             String orgValue = stlCell.getSTLOriginalValue();
             createNewCell(cellIdentity, EngineImpl.convertStringToCellValue(orgValue), orgValue, true);
+            changedCellsCount++;
         }
         List<Cell> topologicalOrder = sortActiveCellsTopologicallyByDFS();
         recalculateByTopologicalOrder(topologicalOrder);
