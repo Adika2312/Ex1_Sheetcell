@@ -184,10 +184,13 @@ public class Sheet {
 
     public void recalculateByTopologicalOrder(List<Cell> topologicalOrder) {
 
-        for (Cell cell : topologicalOrder) {
-            cell.clearDependenciesLists();
-            cell.calculateEffectiveValue();
-        }
+        topologicalOrder.forEach(Cell::clearDependenciesLists);
+        topologicalOrder.forEach(Cell::calculateEffectiveValue);
+
+//        for (Cell cell : topologicalOrder) {
+//            cell.clearDependenciesLists();
+//            cell.calculateEffectiveValue();
+//        }
     }
 
     public static void addToPreviousVersions(Sheet sheet) {
@@ -212,7 +215,7 @@ public class Sheet {
 
         for(Cell cell : updatedCell.getCellsImInfluencing()) {
             changedCellsCount++;
-            calculateChangedCells(cell);
+            calculateCellsImInfluencing(cell);
         }
     }
 }

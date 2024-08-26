@@ -50,8 +50,7 @@ public class EngineImpl implements Engine {
         }
     }
 
-    @Override
-    public STLSheet buildSTLSheetFromXML(String filePath)throws IOException, JAXBException{
+    private STLSheet buildSTLSheetFromXML(String filePath)throws IOException, JAXBException{
         InputStream inputStream = new FileInputStream(filePath);
         JAXBContext jc = JAXBContext.newInstance(JAXB_XML_PACKAGE_NAME);
         Unmarshaller unmarshaller = jc.createUnmarshaller();
@@ -59,8 +58,7 @@ public class EngineImpl implements Engine {
     }
 
 
-    @Override
-    public void buildSheetFromSTLSheet(STLSheet currentSTLSheet) {
+    private void buildSheetFromSTLSheet(STLSheet currentSTLSheet) {
         checkDataValidity(currentSTLSheet);
         currentSheet = new Sheet();
         currentSheet.setName(currentSTLSheet.getName());
@@ -111,15 +109,21 @@ public class EngineImpl implements Engine {
 
     @Override
     public DTO getSheetDTO() {
-        if(currentSheet == null)
-            throw new NullPointerException("You must load a file first.");
+        checkForLoadedFile();
         return DTOFactory.createSheetDTO(currentSheet);
     }
 
     @Override
-    public DTO getCellDTO(String cellIdentity) {
+    public void checkForLoadedFile(){
         if(currentSheet == null)
-            throw new NullPointerException("You must load a file first.");
+        {
+            throw new NullPointerException("Error: You must load a file to the system before performing this action.");
+        }
+    }
+
+    @Override
+    public DTO getCellDTO(String cellIdentity) {
+        checkForLoadedFile();
         Cell currentCell = currentSheet.getCell(cellIdentity);
         if(currentCell == null)
             return DTOFactory.createEmptyCellDTO();
@@ -128,11 +132,13 @@ public class EngineImpl implements Engine {
 
     @Override
     public boolean isCellInBounds(int row, int col) {
+        checkForLoadedFile();
         return(row >= 0 && row < currentSheet.getNumOfRows() && col >= 0 && col < currentSheet.getNumOfCols());
     }
 
     @Override
     public void updateCellValue(String cellIdentity, CellValue value, String originalValue) {
+        checkForLoadedFile();
         Sheet alternativeSheet = currentSheet.clone();
         List<Cell> topologicalOrder = alternativeSheet.sortActiveCellsTopologicallyByDFS();
         alternativeSheet.updateOrCreateCell(cellIdentity, value, originalValue, false);
@@ -176,13 +182,10 @@ public class EngineImpl implements Engine {
         return cellValue;
     }
 
-    @Override
-    public boolean isSheetLoaded(){
-        return currentSheet != null;
-    }
 
     @Override
     public Map<Integer, DTO> getSheetsPreviousVersionsDTO() {
+        checkForLoadedFile();
         Map<Integer,Sheet> previousVersions = currentSheet.getPreviousVersions();
         Map<Integer, DTO> previousVersionsDTO = new TreeMap<>();
 

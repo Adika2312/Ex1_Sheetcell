@@ -22,7 +22,7 @@ public class UI {
     Boolean isProgramRunning = true;
 
     public enum MenuOptions {
-        LOAD_FILE(1, "Load File"), DISPLAY_SHEET(2, "Display Sheet"), DISPLAY_CELL(3, "Display Cell"), UPDATE_CELL(4,"Update Cell"), DISPLAY_VERSIONS(5,"Display Versions"), EXIT(6,"Exit");
+        LOAD_FILE(1, "Load File"), DISPLAY_SHEET(2, "Display Sheet"), DISPLAY_CELL(3, "Display Cell"), UPDATE_CELL(4,"Update Cell"), DISPLAY_VERSIONS(5,"Display Previous Versions"), EXIT(6,"Exit");
 
         private final int value;
         private final String name;
@@ -96,8 +96,32 @@ Welcome to the Sheetcell!
     }
 
     private void displayPreviousVersions() {
-
         Map<Integer, DTO> sheetsPreviousVersionsDTO = engine.getSheetsPreviousVersionsDTO();
+        printPreviousVersionsTable(sheetsPreviousVersionsDTO);
+        peakOnPreviousVersion(sheetsPreviousVersionsDTO);
+    }
+
+    private void peakOnPreviousVersion(Map<Integer, DTO> sheetsPreviousVersionsDTO) {
+        System.out.println("Please enter a previous version number to look back on:");
+        int userInput;
+
+        try{
+            Scanner scanner = new Scanner(System.in);
+            userInput = scanner.nextInt();
+            if(sheetsPreviousVersionsDTO.containsKey(userInput)) {
+                System.out.println(convertSheetDTOToString((SheetDTO) sheetsPreviousVersionsDTO.get(userInput)));
+            }
+            else{
+                System.out.println(String.format("Error: Previous version %s does not exist, Please enter a number between 1 and %d.", userInput,sheetsPreviousVersionsDTO.size()));
+            }
+        }
+        catch (InputMismatchException e){
+            System.out.println(String.format("Error: The input provided is not in the correct format. Please enter a number between 1 and %d.",sheetsPreviousVersionsDTO.size()));
+        }
+    }
+
+    void printPreviousVersionsTable(Map<Integer, DTO> sheetsPreviousVersionsDTO){
+
         StringBuilder sb = new StringBuilder();
         sb.append("""
                 Version    Changed Cells Count
@@ -129,12 +153,10 @@ Welcome to the Sheetcell!
         }
     }
 
+
+
     private void UpdateCell() {
-        if(!engine.isSheetLoaded())
-        {
-            System.out.println("Error: You must load a file to the system before performing this action.");
-            return;
-        }
+        engine.checkForLoadedFile();
         CellCoord cellInput = getCheckAndPrintBasicCellInfo("update its value:");
         System.out.println("\nPlease enter a new value for the cell:");
         Scanner scanner = new Scanner(System.in);
@@ -144,13 +166,8 @@ Welcome to the Sheetcell!
         printSheet();
     }
 
-
     private void PrintCell() {
-        if(!engine.isSheetLoaded())
-        {
-            System.out.println("Error: You must load a file to the system before performing this action.");
-            return;
-        }
+        engine.checkForLoadedFile();
         CellCoord cellInput =  getCheckAndPrintBasicCellInfo("view its value and status:");
         CellDTO currCellDTO = (CellDTO) engine.getCellDTO(cellInput.getIdentity());
         int currVersion = currCellDTO.getVersion();
@@ -241,13 +258,8 @@ Please select an option by entering its corresponding number from the menu below
     }
 
     private void printSheet() {
-        try {
-            String SheetDataToPrint = convertSheetDTOToString((SheetDTO) engine.getSheetDTO());
-            System.out.println(SheetDataToPrint);
-        }
-        catch (NullPointerException e) {
-            System.out.println(e.getMessage());
-        }
+        String SheetDataToPrint = convertSheetDTOToString((SheetDTO) engine.getSheetDTO());
+        System.out.println(SheetDataToPrint);
     }
 
     private String convertSheetDTOToString(SheetDTO sheetDTO) {
