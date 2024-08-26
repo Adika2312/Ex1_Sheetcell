@@ -6,13 +6,13 @@ import api.Engine;
 import dto.CellDTO;
 import dto.DTOFactoryImpl;
 import dto.SheetDTO;
+import exception.CellOutOfBoundsException;
 import exception.FileNotXMLException;
 import impl.*;
 import utility.CellCoord;
 
 import java.io.FileNotFoundException;
 import java.util.InputMismatchException;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.regex.Pattern;
@@ -52,8 +52,14 @@ Welcome to the Sheetcell!
     public void DisplayMenu(Scanner scanner) {
         PrintMenu();
         try {
-            int userInput = scanner.nextInt();
-            if (userInput >= 1 && userInput < MenuOptions.values().length + 1) {
+            int userInput;
+            try {
+                userInput = scanner.nextInt();
+            }
+            catch (InputMismatchException e) {
+                throw new InputMismatchException(String.format("Error: The input provided is not in the correct format. Please enter a number between 1 and %d.", MenuOptions.values().length));
+            }
+            if (userInput >= 1 && userInput <= MenuOptions.values().length) {
 
                 MenuOptions option = MenuOptions.values()[userInput-1];
 
@@ -65,10 +71,10 @@ Welcome to the Sheetcell!
                         printSheet();
                         break;
                     case DISPLAY_CELL:
-                        PrintCell();
+                        printCell();
                         break;
                     case UPDATE_CELL:
-                        UpdateCell();
+                        updateCell();
                         break;
                     case DISPLAY_VERSIONS:
                         displayPreviousVersions();
@@ -82,12 +88,8 @@ Welcome to the Sheetcell!
                 }
             }
             else {
-                System.out.println("Invalid choice. Please enter a number between 1 and " + (MenuOptions.values().length) + ".");
+                System.out.println(String.format("Error: Option %d does not exist. Please enter a number between 1 and %d.",userInput,MenuOptions.values().length));
             }
-        }
-        catch (InputMismatchException e){
-            System.out.println("Invalid choice, please enter a whole number.");
-            scanner.nextLine();
         }
         catch(Exception e) {
             System.out.println(e.getMessage());
@@ -155,7 +157,7 @@ Welcome to the Sheetcell!
 
 
 
-    private void UpdateCell() {
+    private void updateCell() {
         engine.checkForLoadedFile();
         CellCoord cellInput = getCheckAndPrintBasicCellInfo("update its value:");
         System.out.println("\nPlease enter a new value for the cell:");
@@ -166,7 +168,7 @@ Welcome to the Sheetcell!
         printSheet();
     }
 
-    private void PrintCell() {
+    private void printCell() {
         engine.checkForLoadedFile();
         CellCoord cellInput =  getCheckAndPrintBasicCellInfo("view its value and status:");
         CellDTO currCellDTO = (CellDTO) engine.getCellDTO(cellInput.getIdentity());
@@ -206,26 +208,21 @@ Welcome to the Sheetcell!
         String cellIdentity;
         Scanner scanner = new Scanner(System.in);
 
-        while(true){
-            System.out.println("Please enter the cell identity (e.g., A4) to " + massage);
-            cellIdentity = scanner.nextLine().trim().toUpperCase();
+        System.out.println("Please enter the cell identity (e.g., A4) to " + massage);
+        cellIdentity = scanner.nextLine().trim().toUpperCase();
 
-            if (cellPattern.matcher(cellIdentity).matches()) {
-                String columnString = cellIdentity.replaceAll("[0-9]", "");
-                String rowString = cellIdentity.replaceAll("[A-Z]", "");
-                col = extractColumn(columnString);
-                row = extractRow(rowString);
+        if (cellPattern.matcher(cellIdentity).matches()) {
+            String columnString = cellIdentity.replaceAll("[0-9]", "");
+            String rowString = cellIdentity.replaceAll("[A-Z]", "");
+            col = extractColumn(columnString);
+            row = extractRow(rowString);
 
-                if(engine.isCellInBounds(row, col)){
-                    break;
-                }
-                else{
-                    System.out.println("Invalid cell identity, Please enter a cell within the sheet boundaries");
-                }
+            if (!engine.isCellInBounds(row, col)) {
+                throw new CellOutOfBoundsException("Invalid cell identity, Please enter a cell within the sheet boundaries");
             }
-            else {
-                System.out.println("Invalid cell identity. Please enter a cell in the right format (e.g., A4).");
-            }
+        }
+        else {
+            throw new InputMismatchException("Invalid cell identity. Please enter a cell in the right format (e.g., A4).");
         }
 
         return new CellCoord(row, col, cellIdentity);
