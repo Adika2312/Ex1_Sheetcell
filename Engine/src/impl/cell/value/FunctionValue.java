@@ -238,23 +238,23 @@ public class FunctionValue implements CellValue {
 
         // Overloaded methods to handle different argument types
         public double apply(double arg1, double arg2) {
-            throw new UnsupportedOperationException("This function does not support numeric operations");
+            throw new UnsupportedOperationException("Error: This function does not support numeric operations");
         }
 
         public String apply(String str1, String str2) {
-            throw new UnsupportedOperationException("This function does not support string concatenation");
+            throw new UnsupportedOperationException("Error: This function does not support string concatenation");
         }
 
         public String apply(String source, int startIndex, int endIndex) {
-            throw new UnsupportedOperationException("This function does not support substring operations");
+            throw new UnsupportedOperationException("Error: This function does not support substring operations");
         }
 
         public double apply(double arg) {
-            throw new UnsupportedOperationException("This function does not support numeric operations");
+            throw new UnsupportedOperationException("Error: This function does not support numeric operations");
         }
 
         public CellValue apply(String cellId, Cell activatingCell) {
-            throw new UnsupportedOperationException("This function does not support string REF operations");
+            throw new UnsupportedOperationException("Error: This function does not support referring operations");
         }
     }
 
@@ -287,7 +287,7 @@ public class FunctionValue implements CellValue {
             return FunctionType.valueOf(functionName);
         }
         catch (IllegalArgumentException e) {
-            throw new RuntimeException("Invalid function definition: " + functionName);
+            throw new RuntimeException("Error: Invalid function definition: " + functionName);
         }
     }
 

@@ -26,6 +26,8 @@ public class EngineImpl implements Engine {
     private static Sheet currentSheet;
     private final DTOFactory DTOFactory;
     private final String JAXB_XML_PACKAGE_NAME = "generated";
+    private final int MAX_NUM_OF_ROWS = 50;
+    private final int MAX_NUM_OF_COLUMNS = 20;
 
     public EngineImpl(DTOFactory DTOFactory) {
         this.DTOFactory = DTOFactory;
@@ -43,7 +45,7 @@ public class EngineImpl implements Engine {
     private void checkIfFilePathValid(String filePath) throws FileNotFoundException, FileNotXMLException {
         File file = new File(filePath);
         if(!file.exists()){
-            throw new FileNotFoundException("File is not found in the file path given.");
+            throw new FileNotFoundException("Error: File is not found in the file path " + filePath);
         }
         if(!file.getName().endsWith(".xml")){
             throw new FileNotXMLException();
@@ -76,8 +78,9 @@ public class EngineImpl implements Engine {
     }
 
     private void checkSheetSize(int rows, int columns) {
-        if (rows < 1 || rows > 50 || columns < 1 || columns > 20) {
-            throw new InvalidSheetSizeException("The sheet size is out of valid bounds.");
+        if (rows < 1 || rows > MAX_NUM_OF_ROWS || columns < 1 || columns > MAX_NUM_OF_COLUMNS) {
+            throw new InvalidSheetSizeException("Error: The sheet size is not valid," +
+                    String.format(" make sure that the number of rows is between 1 and %d and the number of columns is between 1 and %d.", MAX_NUM_OF_ROWS, MAX_NUM_OF_COLUMNS));
         }
     }
 
@@ -94,14 +97,14 @@ public class EngineImpl implements Engine {
             int column = convertColumnLetterToNumber(columnLetter);
 
             if (row < 1 || row > rowCount || column < 1 || column > columnCount) {
-                throw new CellOutOfBoundsException("A cell is defined outside the sheet boundaries: (" + row + ", " + columnLetter + ")");
+                throw new CellOutOfBoundsException("Error: A cell is defined outside the sheet boundaries: (" + row + ", " + columnLetter + ")");
             }
         }
     }
 
     private int convertColumnLetterToNumber(String columnLetter) {
         if (columnLetter == null || columnLetter.length() != 1 || !Character.isLetter(columnLetter.charAt(0))) {
-            throw new IllegalArgumentException("Invalid column letter: " + columnLetter);
+            throw new IllegalArgumentException("Error: Invalid column letter: " + columnLetter);
         }
 
         return columnLetter.toUpperCase().charAt(0) - 'A' + 1;
@@ -168,7 +171,7 @@ public class EngineImpl implements Engine {
                 cellValue = new NumericValue(numericValue);
             }
             catch (NumberFormatException e) {
-                throw new NumberFormatException("Invalid numeric value.");
+                throw new NumberFormatException("Error: Invalid numeric value.");
             }
         }
         // Check for Function

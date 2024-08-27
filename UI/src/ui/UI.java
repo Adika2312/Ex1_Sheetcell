@@ -298,6 +298,7 @@ Please select an option by entering its corresponding number from the menu below
     }
 
     private String convertSheetDTOToString(SheetDTO sheetDTO) {
+        int NUM_OF_SPACES = 3;
         StringBuilder sb = new StringBuilder();
         int rowsCounter = 1;
         char colCounter = 'A';
@@ -305,7 +306,7 @@ Please select an option by entering its corresponding number from the menu below
 
         sb.append("Name: ").append(sheetDTO.getName()).append("\n");
         sb.append("Version: ").append(sheetDTO.getVersion()).append("\n");
-        sb.append(String.format("%" + (widthOfFirstCol+2) + "s", ""));
+        sb.append(String.format("%" + (widthOfFirstCol+NUM_OF_SPACES) + "s", ""));
 
         for(int i=0;i<sheetDTO.getNumOfCols();i++){
             sb.append(String.format("%-" + (sheetDTO.getColWidth()+1) + "s", colCounter++));
