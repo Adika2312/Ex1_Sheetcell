@@ -19,7 +19,7 @@ public class FunctionValue implements CellValue {
 
     public FunctionValue(String functionDefinition) {
         List<String> argsStr = extractArguments(functionDefinition);
-        functionType = parseFunctionType(argsStr.getFirst());
+        functionType = parseFunctionType(argsStr.getFirst().toUpperCase());
         for (String argument : argsStr.subList(1, argsStr.size())) {
             CellValue value = EngineImpl.convertStringToCellValue(argument);
             value.setActivatingCell(activatingCell);

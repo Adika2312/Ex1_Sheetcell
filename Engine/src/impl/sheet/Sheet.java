@@ -115,7 +115,7 @@ public class Sheet {
 
     public void setActiveCells(List<STLCell> stlCellsList) {
         for (STLCell stlCell : stlCellsList) {
-            String cellIdentity = stlCell.getColumn() + stlCell.getRow();
+            String cellIdentity = stlCell.getColumn().toUpperCase() + stlCell.getRow();
             String orgValue = stlCell.getSTLOriginalValue();
             createNewCell(cellIdentity, EngineImpl.convertStringToCellValue(orgValue), orgValue, true);
             changedCellsCount++;

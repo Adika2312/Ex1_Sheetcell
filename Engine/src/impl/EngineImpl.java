@@ -100,11 +100,11 @@ public class EngineImpl implements Engine {
     }
 
     private int convertColumnLetterToNumber(String columnLetter) {
-        if (columnLetter == null || columnLetter.length() != 1 || !Character.isUpperCase(columnLetter.charAt(0))) {
+        if (columnLetter == null || columnLetter.length() != 1 || !Character.isLetter(columnLetter.charAt(0))) {
             throw new IllegalArgumentException("Invalid column letter: " + columnLetter);
         }
 
-        return columnLetter.charAt(0) - 'A' + 1;
+        return columnLetter.toUpperCase().charAt(0) - 'A' + 1;
     }
 
     @Override
@@ -155,9 +155,10 @@ public class EngineImpl implements Engine {
 
     public static CellValue convertStringToCellValue(String newValue) {
         CellValue cellValue;
+        newValue = newValue.trim();
 
         // Check for Boolean
-        if (newValue.equals("TRUE") || newValue.equals("FALSE")) {
+        if (newValue.equalsIgnoreCase("TRUE") || newValue.equalsIgnoreCase("FALSE")) {
             cellValue = new BooleanValue(Boolean.parseBoolean(newValue));
         }
         // Check for Numerical
@@ -171,7 +172,7 @@ public class EngineImpl implements Engine {
             }
         }
         // Check for Function
-        else if (newValue.matches("\\{[A-Z]+(,[^,]+)*\\}")) {
+        else if (newValue.matches("\\{[A-Za-z]+(,[^,]+)*\\}")) {
             cellValue = new FunctionValue(newValue);
         }
         // Otherwise, treat as String
@@ -187,6 +188,11 @@ public class EngineImpl implements Engine {
     public Map<Integer, DTO> getSheetsPreviousVersionsDTO() {
         checkForLoadedFile();
         Map<Integer,Sheet> previousVersions = currentSheet.getPreviousVersions();
+
+        if(previousVersions.isEmpty()){
+            throw new RuntimeException("There are no previous versions to look back at.");
+        }
+
         Map<Integer, DTO> previousVersionsDTO = new TreeMap<>();
 
         for(Map.Entry<Integer,Sheet> entry : previousVersions.entrySet()) {

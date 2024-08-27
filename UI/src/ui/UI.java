@@ -104,7 +104,7 @@ Welcome to the Sheetcell!
     }
 
     private void peakOnPreviousVersion(Map<Integer, DTO> sheetsPreviousVersionsDTO) {
-        System.out.println("Please enter a previous version number to look back on:");
+        System.out.println("Please enter a previous version number to look back at:");
         int userInput;
 
         try{
@@ -114,11 +114,18 @@ Welcome to the Sheetcell!
                 System.out.println(convertSheetDTOToString((SheetDTO) sheetsPreviousVersionsDTO.get(userInput)));
             }
             else{
-                System.out.println(String.format("Error: Previous version %s does not exist, Please enter a number between 1 and %d.", userInput,sheetsPreviousVersionsDTO.size()));
+                System.out.print(String.format("Error: Previous version %s does not exist, ",userInput));
+
+                if(sheetsPreviousVersionsDTO.size()==1){
+                    System.out.println("only version 1 is currently available for viewing. Enter 1 to look back at this version.");
+                }
+                else {
+                    System.out.println(String.format("please enter a number between 1 and %d.",sheetsPreviousVersionsDTO.size()));
+                }
             }
         }
         catch (InputMismatchException e){
-            System.out.println(String.format("Error: The input provided is not in the correct format. Please enter a number between 1 and %d.",sheetsPreviousVersionsDTO.size()));
+            System.out.println("Error: The input provided is not in the correct format. Please enter a positive whole number.");
         }
     }
 
@@ -173,7 +180,14 @@ Welcome to the Sheetcell!
         CellCoord cellInput =  getCheckAndPrintBasicCellInfo("view its value and status:");
         CellDTO currCellDTO = (CellDTO) engine.getCellDTO(cellInput.getIdentity());
         int currVersion = currCellDTO.getVersion();
-        System.out.println("Current version: " + currVersion);
+        System.out.print("Current version: ");
+
+        if (currVersion != 0) {
+            System.out.println(currVersion);
+        }
+        else{
+            System.out.println();
+        }
         String lst1 = String.join(", ", currCellDTO.getCellsImDependentOn());
         System.out.println("Cells Dependency List: " + lst1);
         String lst2 = String.join(", ", currCellDTO.getCellsImInfluencing());
@@ -275,7 +289,7 @@ Please select an option by entering its corresponding number from the menu below
         sb.append("\n");
 
         for (int i = 0 ; i < sheetDTO.getNumOfRows(); i++) {
-            sb.append(String.format("%0" + widthOfFirstCol + "d", rowsCounter++)).append(" ");
+            sb.append(String.format("%02d", rowsCounter++)).append(" ");
             for (int j = 0; j < sheetDTO.getNumOfCols(); j++) {
 
                 String cellIdentity = convertRowAndColToString(i,j);

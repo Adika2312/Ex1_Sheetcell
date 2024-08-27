@@ -15,7 +15,7 @@ public class Cell implements Editable {
     private String originalValue = "";
     private Set<Cell> cellsImInfluencing = new HashSet<>();
     private Set<Cell> cellsImDependentOn = new HashSet<>();
-    private int version = 1;
+    private int version = 0;
 
     public Cell(Sheet sheet, String identity) {
         mySheet = sheet;
@@ -41,11 +41,10 @@ public class Cell implements Editable {
     @Override
     public void updateValues(CellValue effectiveValue, String originalValue, boolean isFromFile) {
         effectiveValue.setActivatingCell(this);
-        //effectiveValue.calculateAndSetEffectiveValue();
         this.effectiveValue = effectiveValue;
         this.originalValue = originalValue;
-        if(!isFromFile)
-            version++;
+//        if(!isFromFile)
+        version++;
     }
 
     public int getVersion() {

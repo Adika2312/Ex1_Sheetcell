@@ -18,7 +18,7 @@ public class CellDTO implements DTO {
     private final Set<String> cellsImDependentOn;
 
     public CellDTO(){
-        this.version = 1;
+        this.version = 0;
         this.value = new StringValue("");
         this.originalValue = "";
         this.identity = "";
