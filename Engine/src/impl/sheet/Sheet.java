@@ -5,9 +5,10 @@ import generated.STLCell;
 import impl.EngineImpl;
 import impl.cell.Cell;
 
+import java.io.Serializable;
 import java.util.*;
 
-public class Sheet {
+public class Sheet implements Serializable {
     private String name;
     private int version = 1;
     private final Map<String, Cell> activeCells = new HashMap<>();

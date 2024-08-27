@@ -4,12 +4,9 @@ import api.CellValue;
 import exception.WrongParenthesesOrderException;
 import impl.EngineImpl;
 import impl.cell.Cell;
-import impl.sheet.Sheet;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
 
 public class FunctionValue implements CellValue {
     private final FunctionType functionType;

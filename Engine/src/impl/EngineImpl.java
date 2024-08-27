@@ -201,4 +201,37 @@ public class EngineImpl implements Engine {
 
         return previousVersionsDTO;
     }
+
+    @Override
+    public void saveSheetToFile(String filePath) throws IOException {
+
+        if (!filePath.endsWith(".ser")) {
+            filePath = filePath + ".ser";
+        }
+        try( FileOutputStream fileOut = new FileOutputStream(filePath);
+             ObjectOutputStream out = new ObjectOutputStream(fileOut)){
+            out.writeObject(currentSheet);
+        }
+        catch (IOException e) {
+            throw new IOException("Error: File cannot be saved in: " + filePath);
+        }
+    }
+
+    @Override
+    public void loadPreviousSheetFromFile(String filePath) throws IOException, ClassNotFoundException {
+
+        if (!filePath.endsWith(".ser")) {
+            filePath = filePath + ".ser";
+        }
+        try (FileInputStream fileIn = new FileInputStream(filePath);
+             ObjectInputStream in = new ObjectInputStream(fileIn)) {
+            currentSheet = (Sheet) in.readObject();
+        }
+        catch (IOException e) {
+            throw new FileNotFoundException("Error: File not found in: " + filePath);
+        }
+        catch (ClassNotFoundException e){
+            throw new ClassNotFoundException("Error: File failed to load from: " + filePath + ". Please make sure that the file is in the correct format.");
+        }
+    }
 }

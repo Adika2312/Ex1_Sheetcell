@@ -1,14 +1,14 @@
 package impl.cell;
 
 import api.CellValue;
-import api.Editable;
 import impl.cell.value.StringValue;
 import impl.sheet.Sheet;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
-public class Cell implements Editable {
+public class Cell implements Serializable {
     private final Sheet mySheet;
     private final String identity;
     private CellValue effectiveValue = new StringValue("");
@@ -38,12 +38,11 @@ public class Cell implements Editable {
         return mySheet;
     }
 
-    @Override
+
     public void updateValues(CellValue effectiveValue, String originalValue, boolean isFromFile) {
         effectiveValue.setActivatingCell(this);
         this.effectiveValue = effectiveValue;
         this.originalValue = originalValue;
-//        if(!isFromFile)
         version++;
     }
 

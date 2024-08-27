@@ -4,7 +4,6 @@ import api.CellValue;
 import api.DTO;
 import impl.cell.Cell;
 import impl.cell.value.StringValue;
-
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;

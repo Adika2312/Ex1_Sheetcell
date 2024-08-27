@@ -12,6 +12,7 @@ import impl.*;
 import utility.CellCoord;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.InputMismatchException;
 import java.util.Map;
 import java.util.Scanner;
@@ -22,7 +23,7 @@ public class UI {
     Boolean isProgramRunning = true;
 
     public enum MenuOptions {
-        LOAD_FILE(1, "Load File"), DISPLAY_SHEET(2, "Display Sheet"), DISPLAY_CELL(3, "Display Cell"), UPDATE_CELL(4,"Update Cell"), DISPLAY_VERSIONS(5,"Display Previous Versions"), EXIT(6,"Exit");
+        LOAD_XML_FILE(1, "Load XML File"), DISPLAY_SHEET(2, "Display Sheet"), DISPLAY_CELL(3, "Display Cell"), UPDATE_CELL(4,"Update Cell"), DISPLAY_VERSIONS(5,"Display Previous Versions"),SAVE_CURR_SHEET(6,"Save Sheet to File"),LOAD_PREVIOUS_SHEET(7,"Load Previously Saved Sheet"), EXIT(8,"Exit");
 
         private final int value;
         private final String name;
@@ -64,7 +65,7 @@ Welcome to the Sheetcell!
                 MenuOptions option = MenuOptions.values()[userInput-1];
 
                 switch (option) {
-                    case LOAD_FILE:
+                    case LOAD_XML_FILE:
                         loadFile();
                         break;
                     case DISPLAY_SHEET:
@@ -78,6 +79,12 @@ Welcome to the Sheetcell!
                         break;
                     case DISPLAY_VERSIONS:
                         displayPreviousVersions();
+                        break;
+                    case SAVE_CURR_SHEET:
+                        saveCurrSheetToFile();
+                        break;
+                    case LOAD_PREVIOUS_SHEET:
+                        loadPreviousSheetFromFile();
                         break;
                     case EXIT:
                         isProgramRunning = false;
@@ -95,6 +102,23 @@ Welcome to the Sheetcell!
             System.out.println(e.getMessage());
             scanner.nextLine();
         }
+    }
+
+    private void loadPreviousSheetFromFile() throws IOException, ClassNotFoundException {
+        System.out.println("Please enter a file path for loading the sheet:");
+        Scanner scanner = new Scanner(System.in);
+        String filePath = scanner.nextLine();
+        engine.loadPreviousSheetFromFile(filePath);
+        System.out.println("Sheet loaded from file successfully.");
+    }
+
+    private void saveCurrSheetToFile() throws IOException {
+        engine.checkForLoadedFile();
+        System.out.println("Please enter a file path for saving the sheet:");
+        Scanner scanner = new Scanner(System.in);
+        String filePath = scanner.nextLine();
+        engine.saveSheetToFile(filePath);
+        System.out.println("Sheet saved to file successfully.");
     }
 
     private void displayPreviousVersions() {

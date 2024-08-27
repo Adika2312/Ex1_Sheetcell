@@ -2,7 +2,9 @@ package api;
 
 import impl.cell.Cell;
 
-public interface CellValue {
+import java.io.Serializable;
+
+public interface CellValue extends Serializable {
     Object getEffectiveValue();
     Object eval();
     void setActivatingCell(Cell cell);

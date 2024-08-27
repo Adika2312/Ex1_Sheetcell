@@ -15,4 +15,6 @@ public interface Engine {
     DTO getCellDTO(String cellIdentity);
     void checkForLoadedFile();
     Map<Integer,DTO> getSheetsPreviousVersionsDTO();
+    void saveSheetToFile(String filePath) throws IOException;
+    void loadPreviousSheetFromFile(String filePath) throws IOException, ClassNotFoundException;
 }
