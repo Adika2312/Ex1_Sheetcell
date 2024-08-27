@@ -105,7 +105,7 @@ Welcome to the Sheetcell!
     }
 
     private void loadPreviousSheetFromFile() throws IOException, ClassNotFoundException {
-        System.out.println("Please enter a file path for loading the sheet:");
+        System.out.println("Please enter a file path for loading the sheet (e.g., C:\\Users\\YourName\\Documents\\mySheet):");
         Scanner scanner = new Scanner(System.in);
         String filePath = scanner.nextLine();
         engine.loadPreviousSheetFromFile(filePath);
@@ -114,7 +114,7 @@ Welcome to the Sheetcell!
 
     private void saveCurrSheetToFile() throws IOException {
         engine.checkForLoadedFile();
-        System.out.println("Please enter a file path for saving the sheet:");
+        System.out.println("Please enter a full file path for saving the sheet (e.g., C:\\Users\\YourName\\Documents\\mySheet):");
         Scanner scanner = new Scanner(System.in);
         String filePath = scanner.nextLine();
         engine.saveSheetToFile(filePath);
