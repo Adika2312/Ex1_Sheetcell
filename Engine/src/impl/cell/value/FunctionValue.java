@@ -4,6 +4,8 @@ import api.CellValue;
 import exception.WrongParenthesesOrderException;
 import impl.EngineImpl;
 import impl.cell.Cell;
+
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,7 +60,8 @@ public class FunctionValue implements CellValue {
             else if (c == '}') {
                 level--;
                 if (level == 0) {
-                    arguments.add(input.substring(start, i));
+                    if(start != i)
+                        arguments.add(input.substring(start, i));
                     insideArgument = false;
                 }
                 else{
@@ -218,25 +221,33 @@ public class FunctionValue implements CellValue {
         REF {
             @Override
             public CellValue apply(String cellId, Cell activatingCell){
+
+                if(!isStringInCellIdentityFormat(cellId)){
+                    throw new IllegalStateException("Error: " + cellId + " is not a cell identity. Ensure that the argument is in the right format (e.g., {REF,A4}).");
+                }
+
                 Cell referancedCell = activatingCell.getSheet().getCell(cellId.toUpperCase());
+
                 if(referancedCell == null)
                 {
-                    throw new NullPointerException("Error: Cell " + cellId + " contains no value and cannot be referred.");
+                    throw new NullPointerException("Error: Cell " + cellId + " cannot be referenced. Please ensure the cell is within the sheet boundaries and contains a value.");
                 }
+
                 activatingCell.getCellsImDependentOn().add(referancedCell);
                 referancedCell.getCellsImInfluencing().add(activatingCell);
+
                 try {
                     activatingCell.getSheet().detectCycleByDFS();
                 }
                 catch (IllegalStateException e)
                 {
-                    throw new IllegalStateException(e.getMessage() + String.format(" %s cannot refer to %s.", activatingCell.getIdentity(), cellId));
+                    throw new IllegalStateException(e.getMessage());
                 }
+
                 return referancedCell.getEffectiveValue();
             }
         };
 
-        // Overloaded methods to handle different argument types
         public double apply(double arg1, double arg2) {
             throw new UnsupportedOperationException("Error: This function does not support numeric operations");
         }
@@ -256,6 +267,27 @@ public class FunctionValue implements CellValue {
         public CellValue apply(String cellId, Cell activatingCell) {
             throw new UnsupportedOperationException("Error: This function does not support referring operations");
         }
+    }
+
+    private static boolean isStringInCellIdentityFormat(String str){
+        if (str == null || str.length() < 2) {
+            return false;
+        }
+
+        char firstChar = str.charAt(0);
+        String restOfString = str.substring(1);
+
+        if (!Character.isLetter(firstChar)) {
+            return false;
+        }
+
+        try {
+            Integer.parseInt(restOfString);
+        } catch (NumberFormatException e) {
+            return false; // Not a valid number
+        }
+
+        return true;
     }
 
     private void checkNumOfArguments(int numOfArgumentsExp, String numArgsStr) throws IllegalArgumentException {
@@ -294,5 +326,25 @@ public class FunctionValue implements CellValue {
     @Override
     public Cell getActivatingCell() {
         return activatingCell;
+    }
+
+    @Override
+    public FunctionValue clone(){
+        try {
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            ObjectOutputStream out = new ObjectOutputStream(bos);
+
+            out.writeObject(this);
+            out.flush();
+            out.close();
+
+            ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
+            ObjectInputStream in = new ObjectInputStream(bis);
+
+            return (FunctionValue) in.readObject();
+        }
+        catch (IOException | ClassNotFoundException e) {
+            throw new RuntimeException("Clone failed", e);
+        }
     }
 }

@@ -7,17 +7,13 @@ import exception.InvalidSheetSizeException;
 import generated.STLCell;
 import generated.STLSheet;
 import impl.cell.Cell;
-import impl.cell.value.BooleanValue;
-import impl.cell.value.FunctionValue;
-import impl.cell.value.NumericValue;
-import impl.cell.value.StringValue;
+import impl.cell.value.*;
 import impl.sheet.Sheet;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Unmarshaller;
 
 import java.io.*;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -34,10 +30,15 @@ public class EngineImpl implements Engine {
     }
 
     @Override
-    public void loadFile(String filePath) throws IOException, JAXBException {
-
+    public void loadFile(String filePath) throws IOException {
+        STLSheet currentSTLSheet;
         checkIfFilePathValid(filePath);
-        STLSheet currentSTLSheet = buildSTLSheetFromXML(filePath);
+        try{
+            currentSTLSheet = buildSTLSheetFromXML(filePath);
+        }
+        catch (JAXBException e){
+            throw new RuntimeException("Error: The file is not in the correct format.");
+        }
         buildSheetFromSTLSheet(currentSTLSheet);
         Sheet.clearPreviousVersions();
     }
@@ -97,7 +98,7 @@ public class EngineImpl implements Engine {
             int column = convertColumnLetterToNumber(columnLetter);
 
             if (row < 1 || row > rowCount || column < 1 || column > columnCount) {
-                throw new CellOutOfBoundsException("Error: A cell is defined outside the sheet boundaries: (" + row + ", " + columnLetter + ")");
+                throw new CellOutOfBoundsException("Error: A cell is defined outside the sheet boundaries: (" + row + ", " + columnLetter + ").");
             }
         }
     }
@@ -175,7 +176,7 @@ public class EngineImpl implements Engine {
             }
         }
         // Check for Function
-        else if (newValue.matches("\\{[A-Za-z]+(,[^,]+)*\\}")) {
+        else if (newValue.matches("\\{[A-Za-z]+(,([^,]*)?)*\\}")) {
             cellValue = new FunctionValue(newValue);
         }
         // Otherwise, treat as String
@@ -205,9 +206,19 @@ public class EngineImpl implements Engine {
         return previousVersionsDTO;
     }
 
+    private void checkIfFilePathIsDir(String filePath) throws IOException {
+        File file = new File(filePath);
+
+        if (file.isDirectory()) {
+            throw new IOException("Error: The provided path is a directory, not a valid file path: " + filePath +
+                    ". Make sure that the file path contains the file name.");
+        }
+    }
+
     @Override
     public void saveSheetToFile(String filePath) throws IOException {
 
+        checkIfFilePathIsDir(filePath);
 
         if (!filePath.endsWith(".ser")) {
             filePath = filePath + ".ser";
@@ -223,6 +234,8 @@ public class EngineImpl implements Engine {
 
     @Override
     public void loadPreviousSheetFromFile(String filePath) throws IOException, ClassNotFoundException {
+
+        checkIfFilePathIsDir(filePath);
 
         if (!filePath.endsWith(".ser")) {
             filePath = filePath + ".ser";

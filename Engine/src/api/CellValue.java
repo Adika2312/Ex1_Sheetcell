@@ -10,5 +10,6 @@ public interface CellValue extends Serializable {
     void setActivatingCell(Cell cell);
     void calculateAndSetEffectiveValue();
     Cell getActivatingCell();
+    CellValue clone();
 }
 

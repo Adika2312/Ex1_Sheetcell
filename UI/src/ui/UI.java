@@ -10,7 +10,6 @@ import exception.CellOutOfBoundsException;
 import exception.FileNotXMLException;
 import impl.*;
 import utility.CellCoord;
-
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.InputMismatchException;
@@ -114,7 +113,7 @@ Welcome to the Sheetcell!
 
     private void saveCurrSheetToFile() throws IOException {
         engine.checkForLoadedFile();
-        System.out.println("Please enter a full file path for saving the sheet (e.g., C:\\Users\\YourName\\Documents\\mySheet):");
+        System.out.println("Please enter the complete file path including the file name to save the sheet (e.g., C:\\Users\\YourName\\Documents\\mySheet) :");
         Scanner scanner = new Scanner(System.in);
         String filePath = scanner.nextLine();
         engine.saveSheetToFile(filePath);
@@ -256,11 +255,11 @@ Welcome to the Sheetcell!
             row = extractRow(rowString);
 
             if (!engine.isCellInBounds(row, col)) {
-                throw new CellOutOfBoundsException("Invalid cell identity, Please enter a cell within the sheet boundaries");
+                throw new CellOutOfBoundsException("Invalid cell identity, Please enter a cell within the sheet boundaries.");
             }
         }
         else {
-            throw new InputMismatchException("Invalid cell identity. Please enter a cell in the right format (e.g., A4).");
+            throw new InputMismatchException("Invalid cell identity, Please enter a cell in the right format (e.g., A4).");
         }
 
         return new CellCoord(row, col, cellIdentity);

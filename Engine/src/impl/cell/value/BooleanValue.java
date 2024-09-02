@@ -36,4 +36,8 @@ public class BooleanValue implements CellValue {
         return activatingCell;
     }
 
+    @Override
+    public BooleanValue clone() {
+        return new BooleanValue(value);
+    }
 }

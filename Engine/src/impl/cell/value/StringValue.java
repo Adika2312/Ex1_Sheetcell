@@ -36,4 +36,9 @@ public class StringValue implements CellValue {
     public Cell getActivatingCell() {
         return activatingCell;
     }
+
+    @Override
+    public StringValue clone() {
+        return new StringValue(value);
+    }
 }

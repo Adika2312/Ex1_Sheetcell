@@ -40,4 +40,8 @@ public class NumericValue implements CellValue {
         return activatingCell;
     }
 
+    @Override
+    public NumericValue clone() {
+        return new NumericValue(value);
+    }
 }

@@ -25,7 +25,7 @@ public class Cell implements Serializable {
     public Cell(Sheet sheet, Cell cellToCopy) {
         mySheet = sheet;
         this.identity = cellToCopy.getIdentity();
-        effectiveValue = cellToCopy.getEffectiveValue();
+        effectiveValue = cellToCopy.getEffectiveValue().clone();
         effectiveValue.setActivatingCell(this);
         originalValue = cellToCopy.getOriginalValue();
         cellsImInfluencing = new HashSet<>(cellToCopy.getCellsImInfluencing());

@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.util.Map;
 
 public interface Engine {
-    void loadFile(String filePath) throws IOException, JAXBException;
+    void loadFile(String filePath) throws IOException;
     DTO getSheetDTO();
     boolean isCellInBounds(int row, int col);
     void updateCellValue(String cellIdentity, CellValue value, String originalValue);

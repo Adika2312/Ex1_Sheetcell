@@ -188,16 +188,12 @@ public class Sheet implements Serializable {
 
         topologicalOrder.forEach(Cell::clearDependenciesLists);
         topologicalOrder.forEach(Cell::calculateEffectiveValue);
-
-//        for (Cell cell : topologicalOrder) {
-//            cell.clearDependenciesLists();
-//            cell.calculateEffectiveValue();
-//        }
     }
 
     public static void addToPreviousVersions(Sheet sheet) {
         previousVersions.put(sheet.getVersion(),sheet);
     }
+
 
     public static void clearPreviousVersions() {
         previousVersions.clear();

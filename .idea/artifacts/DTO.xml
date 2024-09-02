@@ -1,5 +1,5 @@
 <component name="ArtifactManager">
-  <artifact type="jar" name="DTO">
+  <artifact type="jar" build-on-make="true" name="DTO">
     <output-path>$PROJECT_DIR$/out/artifacts/DTO</output-path>
     <root id="archive" name="DTO.jar">
       <element id="module-output" name="DTO" />
